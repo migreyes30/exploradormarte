@@ -6,24 +6,42 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import mx.itesm.cem.explorador.Agente;
+import mx.itesm.cem.explorador.Monticulo;
+import mx.itesm.cem.explorador.Nave;
+import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
 
 
 public class TableroGrafico {
 	
+	public static JPanel panelMatriz;
+	public static JFrame frame;
+	public static JPanel panelMenu;
+	public static JLayeredPane panelDerecha;
+	
+	public static NaveGrafica naveGrafica;
+	public static ArrayList<AgenteGrafico> listaAgentesGraficos = 
+											new ArrayList<AgenteGrafico>();
+	public static ArrayList<MonticuloGrafico> listaMonticulosGraficos = 
+											new ArrayList<MonticuloGrafico>();
+	public static ArrayList<ObstaculoGrafico> listaObstaculosGraficos = 
+											new ArrayList<ObstaculoGrafico>();
+	
 	public TableroGrafico(){
-		JFrame frame = new JFrame("Explorador Marte");
+		frame = new JFrame("Explorador Marte");
 		frame.setSize(800, 635);
-		JPanel panelMenu = new JPanel();
-		JLayeredPane panelDerecha = new JLayeredPane();
+		panelMenu = new JPanel();
+		panelDerecha = new JLayeredPane();
 		
-		JPanel panelMatriz = new JPanel();
+		panelMatriz = new JPanel();
 		
 		frame.getContentPane().setLayout(new BorderLayout());		
 		panelMatriz.setLayout(new GridLayout(15,15));
@@ -31,6 +49,12 @@ public class TableroGrafico {
 		ImageIcon fondo = new ImageIcon(getClass().getResource("Mars_atmosphere.jpg"));
 		JLabel labelFondo = new JLabel(fondo);
 		labelFondo.setSize(fondo.getIconWidth(), fondo.getIconHeight());
+		
+		panelMenu.setBackground(new Color(255,0,0));
+		panelMenu.setSize(200,600);
+		panelMatriz.setOpaque(false);
+		panelMatriz.setSize(600, 600);
+		
 		
 		
 		for(int j=0; j < 225; j++){
@@ -40,47 +64,18 @@ public class TableroGrafico {
 			panelMatriz.add(x);
 		}
 		
-/*		for(int i=0; i < 10; i++){
-			int index = (int)(Math.random()*225);
-			this.replace(panelMatriz, index, new AgenteGrafico(index, this.convierteAPosicion(index)));
-		}
-		
-*/		
-//			AgenteGrafico x = new AgenteGrafico(0, this.convierteAPosicion(4));
-//			x.setSize(40,40);
-//			x.setBorder(BorderFactory.createLineBorder(Color.black));
-//			//panelMatriz.add(new AgenteGrafico(0, this.convierteAPosicion(4)), 2);
-//		
-		Tablero tb = new Tablero();
-		
-		for(int j=0; j < Tablero.matriz.length; j++){
-			for(int i = 0; i < Tablero.matriz.length; i++){
-				if(Tablero.matriz[i][j] == "A"){
-					int id = (int)(Math.random()*35536);
-					this.replace(panelMatriz, convierteAIndice(i, j), new AgenteGrafico(id, new Posicion(i,j)));;
-				}
-			}
-			
-		}
-		
-		tb.prueba();
-		
-		panelMenu.setBackground(new Color(255,0,0));
-		panelMenu.setSize(200,600);
-		panelMatriz.setOpaque(false);
-		panelMatriz.setSize(600, 600);
+		agregaObjetosAListas();
 		
 		panelDerecha.add(labelFondo, new Integer(1));
 		panelDerecha.add(panelMatriz, new Integer(2));
-			
+		
+		actualizaTablero();
+		
 		frame.getContentPane().add(BorderLayout.CENTER, panelDerecha);
 		//frame.getContentPane().add(BorderLayout.WEST, panelMenu);
 		//frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		
-		
-		System.out.println(panelMatriz.getComponents());
 	}
 	
 	public Posicion convierteAPosicion(int i){
@@ -109,7 +104,70 @@ public class TableroGrafico {
 		panel.add(jl,i);
 	}
 	
+	public void actualizaTablero(){
+		/*for(int j=0; j < Tablero.matriz.length; j++){
+			for(int i = 0; i < Tablero.matriz.length; i++){
+				if(Tablero.matriz[i][j].charAt(0) == 'A'){
+					String id = Tablero.matriz[i][j].substring(1);
+					System.out.println("Encontre agente con id: " + id + " en " + i + ", " + j);
+					replace(panelMatriz, convierteAIndice(i, j), new AgenteGrafico(id, new Posicion(i,j)));;
+				}
+				else if(Tablero.matriz[i][j] == "O"){
+					int id = (int)(Math.random()*35536);
+					System.out.println("Cree obstaculo con id: " + id + " en " + i + ", " + j);
+					replace(panelMatriz, convierteAIndice(i, j), new ObstaculoGrafico(id, new Posicion(i,j)));;
+				}
+				else if(Tablero.matriz[i][j] == "M"){
+					int id = (int)(Math.random()*35536);
+					System.out.println("Cree monticulo con id: " + id + " en " + i + ", " + j);
+					replace(panelMatriz, convierteAIndice(i, j), new MonticuloGrafico(id, new Posicion(i,j)));;
+				}
+				else if(Tablero.matriz[i][j] == "N"){
+					int id = (int)(Math.random()*35536);
+					System.out.println("Cree nave con id: " + id + " en " + i + ", " + j);
+					replace(panelMatriz, convierteAIndice(i, j), new NaveGrafica(id, new Posicion(i,j)));;
+				}
+			}
+			
+		}
+		*/
+		
+		/*Insertando nave*/
+		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getX(), TableroGrafico.naveGrafica.getPosicion().getY()), TableroGrafico.naveGrafica);
+		/*Iterar sobre lista de obstaculos*/
+		for(int i=0; i < TableroGrafico.listaObstaculosGraficos.size(); i++){
+			ObstaculoGrafico temp = TableroGrafico.listaObstaculosGraficos.get(i);
+			System.out.println("Encontre obstaculo con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+		}
+		
+		/*Iterar sobre lista de monticulos*/
+		for(int i=0; i < TableroGrafico.listaMonticulosGraficos.size(); i++){
+			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);
+			System.out.println("Encontre monticulo con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+		}
+	}
+	
+	public void agregaObjetosAListas(){
+		for(int j=0; j < Tablero.matriz.length; j++){
+			for(int i = 0; i < Tablero.matriz.length; i++){
+				char tipo = Tablero.matriz[i][j].charAt(0);
+				String id = Tablero.matriz[i][j].substring(1);
+				if(tipo == 'A')
+					TableroGrafico.listaAgentesGraficos.add(new AgenteGrafico(tipo+id, new Posicion(i,j)));
+				else if(tipo == 'O')
+					TableroGrafico.listaObstaculosGraficos.add(new ObstaculoGrafico(tipo+id, new Posicion(i,j)));
+				else if(tipo == 'M')
+					TableroGrafico.listaMonticulosGraficos.add(new MonticuloGrafico(tipo+id, new Posicion(i,j)));
+				else if(tipo == 'N')
+					naveGrafica = new NaveGrafica(tipo+id, new Posicion(i,j));
+			}
+		}
+	}
 	public static void main(String[] args){
+		Tablero tb = new Tablero();
+		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
 		
 	}		

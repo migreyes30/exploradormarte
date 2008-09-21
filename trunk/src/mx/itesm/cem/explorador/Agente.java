@@ -1,5 +1,6 @@
 package mx.itesm.cem.explorador;
 
+
 public class Agente {
 	private Posicion posicion;
 	private int capacidad;
@@ -16,15 +17,16 @@ public class Agente {
 	public static final int DIAG_INF_IZQ = 1;
 
 	public Agente(){
+		
 
 	}
 	public Agente(Posicion posicionInicial, String id){
-		this.posicion = Tablero.posicionNave;
-		this.capacidad = (int) Math.random()* ((Tablero.totalPiedras/4)+1);
-		this.cargaActual = 0;
-		this.resultado.setExito(false);
-		this.resultado.setOcupacion((Nave)(Tablero.matriz[Tablero.posicionNave.getX()][Tablero.posicionNave.getY()]));
-		this.resultado.setPosicion(Tablero.posicionNave);
+		this.setPosicion(Tablero.posicionNave);
+		this.setCapacidad((int) Math.random()* ((Tablero.totalPiedras/4)+1));
+		this.setCargaActual(0);
+//		this.resultado.setExito(false);
+//		this.resultado.setOcupacion((Nave)(Tablero.matriz[Tablero.posicionNave.getX()][Tablero.posicionNave.getY()]));
+//		this.resultado.setPosicion(Tablero.posicionNave);
 	}
 
 	public Posicion getPosicion() {

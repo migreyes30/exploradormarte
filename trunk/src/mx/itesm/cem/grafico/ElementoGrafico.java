@@ -8,7 +8,7 @@ import mx.itesm.cem.explorador.Posicion;
 public class ElementoGrafico extends JLabel{
 	
 	protected Posicion posicion;
-	protected int id;
+	protected String id;
 	protected ImageIcon imagen;
 	
 	public Posicion getPosicion() {
@@ -19,11 +19,11 @@ public class ElementoGrafico extends JLabel{
 		this.posicion = posicion;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 }

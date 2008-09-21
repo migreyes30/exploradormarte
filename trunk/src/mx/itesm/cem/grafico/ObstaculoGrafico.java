@@ -9,7 +9,7 @@ import mx.itesm.cem.explorador.Posicion;
 
 public class ObstaculoGrafico extends ElementoGrafico implements ActionListener {
 	
-	public ObstaculoGrafico(int id, Posicion pos){
+	public ObstaculoGrafico(String id, Posicion pos){
 		this.id = id;
 		this.posicion = pos;
 		this.imagen = new ImageIcon(getClass().getResource("obstaculo.png"));

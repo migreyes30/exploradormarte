@@ -1,5 +1,6 @@
 package mx.itesm.cem.explorador;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 
@@ -23,89 +24,22 @@ public class Tablero {
 	public static String[][] matriz;
 	String fondo; //Imagen; despues tenemos que usar la clase Image
 	int[] capas;
-	int totalPiedras;
-	int piedrasNave;
+	public static int totalPiedras;
+	public static int piedrasNave;
 	public static final int CASILLAS = 15;
+	public static Posicion posicionNave;
+	public static Nave nave;
+	public static ArrayList<Agente> listaAgentes = new ArrayList<Agente>();
+	public static ArrayList<Monticulo> listaMonticulos = new ArrayList<Monticulo>();
+	public static ArrayList<Obstaculo> listaObstaculos = new ArrayList<Obstaculo>();
+	
 	
 	
 	public Tablero(){
 		//Constructor del tablero
-		Tablero.matriz = hazMatriz();
+		Tablero.matriz = creaMatriz();
 		
 		
-	}
-	
-	public String[][] hazMatriz(){
-		// Aqui creamos la matriz al azar
-		String[][] mat = new String[CASILLAS][CASILLAS];
-		String[] sa = {"-", "A", "M", "O", "N"};
-		int cantVacio = 0,
-			cantAgente = 10,
-			cantMonticulo = 10,
-			cantObstaculo = 40,
-			cantNave = 1;
-		
-		int[] na = {cantVacio, cantAgente, cantMonticulo, cantObstaculo, cantNave};
-		
-		final int LIMITX = CASILLAS;
-		final int LIMITY = CASILLAS;
-		
-		
-		for(int y=0; y < LIMITY; y++){
-			int contx1 = 0;
-			int contx2 = 0;
-			
-			for(int x =0; x < LIMITX; x++){	
-				
-				if(x < LIMITX / 2){ // SOLO DOS ELEMENTOS
-					if(contx1 < 2){
-						int r = (int)(Math.random()*4);
-						if(na[r] > 0 && !sa[r].equals("-")){
-							//System.out.print(sa[r]);
-							mat[x][y] = sa[r];
-							na[r]--;
-							contx1++;
-						}
-						else if(sa[r].equals("-")){	
-							//System.out.print(sa[r]);
-							mat[x][y] = sa[r];
-						}
-						else{
-							//System.out.print("-");
-							mat[x][y] = "-";
-						}	
-					}
-					else{
-						//System.out.print("-");
-						mat[x][y] = "-";
-					}
-				}
-				else {
-					if(contx2 < 2){
-						int r = (int)(Math.random()*4);
-						if(na[r] > 0 && !sa[r].equals("-")){
-							//System.out.print(sa[r]);
-							mat[x][y] = sa[r];
-							na[r]--;
-							contx2++;
-						}
-						else if(sa[r].equals("-")){		
-							//System.out.print(sa[r]);
-							mat[x][y] = sa[r];
-						}
-						else{
-							//System.out.print("-");
-							mat[x][y] = "-";
-						}	
-					}	
-					else{
-						//System.out.print("-");
-						mat[x][y] = "-";
-					}
-				}
-			}
-		}
-		return mat;
 	}
 	
 	public boolean isTerminado(){
@@ -115,19 +49,82 @@ public class Tablero {
 			return false;
 	}
 	
-	public void prueba(){
-		
+	public String toString(){
+		String res = "";	
 		for(int j=0; j < Tablero.matriz.length; j++){
 			for(int i = 0; i < Tablero.matriz.length; i++){
-				System.out.print(Tablero.matriz[i][j]);
+				res += Tablero.matriz[i][j];
 			}
-			System.out.println();
+			res += "\n";
 		}
+		return res;
 	}
 	
-	public static void main(String[] args){
-			Tablero t = new Tablero();
-			t.prueba();
+	public String[][] creaMatriz(){
+		// Aqui creamos la matriz al azar
+		String[][] mat = new String[CASILLAS][CASILLAS];
+		
+		for(int i=0; i < mat.length; i++){
+			for(int j=0; j < mat.length; j++){
+				mat[i][j] = "-";
+			}
+		}
+		
+		int xAzar, yAzar,
+			cantAgente = 10,
+			cantMonticulo = 10,
+			cantObstaculo = 10;
+		
+		/*----------------------
+		 *Insertando Nave
+		 *---------------------
+		 */
+		xAzar = (int)(Math.random()* CASILLAS);
+		yAzar = (int)(Math.random()* CASILLAS);
+		
+		mat[xAzar][yAzar] = "N" + (int)(Math.random()*35536);
+		nave = new Nave(mat[xAzar][yAzar], new Posicion(xAzar, yAzar));
+		Tablero.posicionNave = nave.getPosicion();
+		/*-----------------------*/
+		
+		/*Insertando Monticulos*/
+		while(cantMonticulo > 0){
+			xAzar = (int)(Math.random()* CASILLAS);
+			yAzar = (int)(Math.random()* CASILLAS);
 			
-	}		
+			if(mat[xAzar][yAzar] == "-"){
+				String id = "M" + (int)(Math.random()*35536);
+				mat[xAzar][yAzar] = id;
+				Tablero.listaMonticulos.add(new Monticulo(id, 
+													new Posicion(xAzar,yAzar)));
+				cantMonticulo--;
+			}
+			
+		}
+		
+		/*Insertando Obstaculos*/
+		while(cantObstaculo > 0){
+			xAzar = (int)(Math.random()* CASILLAS);
+			yAzar = (int)(Math.random()* CASILLAS);
+			
+			if(mat[xAzar][yAzar] == "-"){
+				String id = "O" + (int)(Math.random()*35536);
+				mat[xAzar][yAzar] = id;
+				Tablero.listaObstaculos.add(new Obstaculo(id, 
+													new Posicion(xAzar,yAzar)));
+				cantObstaculo--;
+			}
+			
+		}
+
+		return mat;
+	}
+	
+    //TODO: Metodos para obtener monticulos y obstaculos por su id!!
+	
+	public static void main(String[] args){
+		Tablero t = new Tablero();
+		System.out.println(t.toString());
+	}
+		
 }
