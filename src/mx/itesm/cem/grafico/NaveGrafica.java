@@ -9,7 +9,7 @@ import mx.itesm.cem.explorador.Posicion;
 
 public class NaveGrafica extends ElementoGrafico implements ActionListener {
 	
-	public NaveGrafica(int id, Posicion pos){
+	public NaveGrafica(String id, Posicion pos){
 		this.id = id;
 		this.posicion = pos;
 		this.imagen = new ImageIcon(getClass().getResource("nave.png"));

@@ -3,10 +3,11 @@ package mx.itesm.cem.explorador;
 public class Obstaculo {
 
 	private Posicion posicion;
-	private String imagen;
+	private String id;
 
-	public Obstaculo(Posicion posicion){
-		this.posicion = posicion;
+	public Obstaculo(String id, Posicion pos){
+		this.setId(id);
+		this.setPosicion(pos);
 	}
 	public Posicion getPosicion() {
 		return posicion;
@@ -14,10 +15,12 @@ public class Obstaculo {
 	public void setPosicion(Posicion posicion) {
 		this.posicion = posicion;
 	}
-	public String getImagen() {
-		return imagen;
+	
+	public String getId() {
+		return id;
 	}
-	public void setImagen(String imagen) {
-		this.imagen = imagen;
+	public void setId(String id) {
+		this.id = id;
 	}
+	
 }
