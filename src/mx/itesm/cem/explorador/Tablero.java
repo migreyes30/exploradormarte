@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 
+import mx.itesm.cem.explorador.exception.NoExisteElementoException;
+
 public class Tablero {
 	
 	/*
 	 * Definicion de elementos
 	 * 
+	 * A -> Agente
 	 * M -> Monticulo
 	 * O -> Obstaculo
 	 * N -> Nave
@@ -16,10 +19,9 @@ public class Tablero {
 	 * 
 	 * Tablero:
 	 * 600*600 pixeles
-	 * Cada cuadro 30 pixeles* 30 pixeles
-	 * Total cuadros = 20 * 20
+	 * Cada cuadro 40 pixeles * 40 pixeles
+	 * Total cuadros = 15 * 15
 	 */
-	//int[][] posicionNave;  CREO QUE NO ES ASI... MMM..
 	
 	public static String[][] matriz;
 	String fondo; //Imagen; despues tenemos que usar la clase Image
@@ -34,7 +36,6 @@ public class Tablero {
 	public static ArrayList<Obstaculo> listaObstaculos = new ArrayList<Obstaculo>();
 	
 	
-	
 	public Tablero(){
 		//Constructor del tablero
 		Tablero.matriz = creaMatriz();
@@ -43,21 +44,10 @@ public class Tablero {
 	}
 	
 	public boolean isTerminado(){
-		if(this.piedrasNave == totalPiedras)
+		if(Tablero.piedrasNave == totalPiedras)
 			return true;
 		else
 			return false;
-	}
-	
-	public String toString(){
-		String res = "";	
-		for(int j=0; j < Tablero.matriz.length; j++){
-			for(int i = 0; i < Tablero.matriz.length; i++){
-				res += Tablero.matriz[i][j];
-			}
-			res += "\n";
-		}
-		return res;
 	}
 	
 	public String[][] creaMatriz(){
@@ -71,9 +61,9 @@ public class Tablero {
 		}
 		
 		int xAzar, yAzar,
-			cantAgente = 10,
+			cantAgente = 1,
 			cantMonticulo = 10,
-			cantObstaculo = 10;
+			cantObstaculo = 40;
 		
 		/*----------------------
 		 *Insertando Nave
@@ -116,15 +106,73 @@ public class Tablero {
 			}
 			
 		}
+		
+		/*Insertando Agentes*/
+		while(cantAgente > 0){
+			String id = "A" + (int)(Math.random()*35536);
+			Tablero.listaAgentes.add(new Agente(id));
+			cantAgente--;
+			
+			
+		}
 
 		return mat;
 	}
 	
-    //TODO: Metodos para obtener monticulos y obstaculos por su id!!
+	/* Método para obtener un elemento con su id.
+	 * 
+	 * Se debe hacer un cast cuando se mande a llamar este metodo
+	 * Por ejemplo:
+	 * Obstaculo o = (Obstaculo) tablero.obtenerElementoConId("unId");
+	 * Monticulo m = (Monticulo) tablero.obtenerElementoConId("otroId");
+	 */
+	public static Object obtenerElementoConId(String id){
+		char tipo = id.charAt(0);
+		switch(tipo){
+			case 'A':
+				for(int i=0; i < Tablero.listaAgentes.size(); i++){
+					Agente temp = Tablero.listaAgentes.get(i);
+					if(temp.getId() == id)
+						return temp;
+				}
+				
+			case 'M':
+				for(int i=0; i < Tablero.listaMonticulos.size(); i++){
+					Monticulo temp = Tablero.listaMonticulos.get(i);
+					if(temp.getId() == id)
+						return temp;
+				}
+				
+			case 'O':
+				for(int i=0; i < Tablero.listaObstaculos.size(); i++){
+					Obstaculo temp = Tablero.listaObstaculos.get(i);
+					if(temp.getId() == id)
+						return temp;
+				}
+				
+			case 'N':
+				if(Tablero.nave.getId() == id)
+					return Tablero.nave;
+			default:
+				throw new NoExisteElementoException("No existe elemento");
+		}
+	}
+	
+	public String toString(){
+		String res = "";	
+		for(int j=0; j < Tablero.matriz.length; j++){
+			for(int i = 0; i < Tablero.matriz.length; i++){
+				res += Tablero.matriz[i][j];
+			}
+			res += "\n";
+		}
+		return res;
+	}
 	
 	public static void main(String[] args){
 		Tablero t = new Tablero();
 		System.out.println(t.toString());
+		
 	}
 		
 }
