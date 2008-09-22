@@ -6,7 +6,7 @@ public class Agente {
 	private int capacidad;
 	private int cargaActual;
 	private String id;
-	private ResultadoCaminar resultado;
+	private ResultadoCaminar resultado = new ResultadoCaminar();
 	public static final int ABAJO = 2;
 	public static final int ARRIBA = 5;
 	public static final int IZQUIERDA = 7;
@@ -20,7 +20,8 @@ public class Agente {
 		
 
 	}
-	public Agente(Posicion posicionInicial, String id){
+	public Agente(String id){
+		this.setId(id);
 		this.setPosicion(Tablero.posicionNave);
 		this.setCapacidad((int) Math.random()* ((Tablero.totalPiedras/4)+1));
 		this.setCargaActual(0);
@@ -73,7 +74,7 @@ public class Agente {
 		int i = this.posicion.getX();
 		int j = this.posicion.getY();
 
-		int movimiento = (int) Math.random()*9;
+		int movimiento = (int)(Math.random()*9);
 		Object casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 

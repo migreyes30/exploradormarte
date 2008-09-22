@@ -18,6 +18,7 @@ import mx.itesm.cem.explorador.Nave;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
+import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 
 
 public class TableroGrafico {
@@ -55,10 +56,7 @@ public class TableroGrafico {
 		panelMatriz.setOpaque(false);
 		panelMatriz.setSize(600, 600);
 		
-		
-		
 		for(int j=0; j < 225; j++){
-			
 			JLabel x = new JLabel("" + j);
 			x.setSize(40,40);
 			panelMatriz.add(x);
@@ -80,19 +78,15 @@ public class TableroGrafico {
 	
 	public Posicion convierteAPosicion(int i){
 		int x,y;
-		
 		if(i%Tablero.CASILLAS == 0){
 			y = i/Tablero.CASILLAS;
 			x = Tablero.CASILLAS - 1;
 		}
-		
 		else{
 			y = (i / Tablero.CASILLAS) + 1;
 			x = (i%Tablero.CASILLAS);
 		}
-		
 		return new Posicion(x,y);
-		
 	}
 	
 	public int convierteAIndice(int x, int y){
@@ -105,42 +99,26 @@ public class TableroGrafico {
 	}
 	
 	public void actualizaTablero(){
-		/*for(int j=0; j < Tablero.matriz.length; j++){
-			for(int i = 0; i < Tablero.matriz.length; i++){
-				if(Tablero.matriz[i][j].charAt(0) == 'A'){
-					String id = Tablero.matriz[i][j].substring(1);
-					System.out.println("Encontre agente con id: " + id + " en " + i + ", " + j);
-					replace(panelMatriz, convierteAIndice(i, j), new AgenteGrafico(id, new Posicion(i,j)));;
-				}
-				else if(Tablero.matriz[i][j] == "O"){
-					int id = (int)(Math.random()*35536);
-					System.out.println("Cree obstaculo con id: " + id + " en " + i + ", " + j);
-					replace(panelMatriz, convierteAIndice(i, j), new ObstaculoGrafico(id, new Posicion(i,j)));;
-				}
-				else if(Tablero.matriz[i][j] == "M"){
-					int id = (int)(Math.random()*35536);
-					System.out.println("Cree monticulo con id: " + id + " en " + i + ", " + j);
-					replace(panelMatriz, convierteAIndice(i, j), new MonticuloGrafico(id, new Posicion(i,j)));;
-				}
-				else if(Tablero.matriz[i][j] == "N"){
-					int id = (int)(Math.random()*35536);
-					System.out.println("Cree nave con id: " + id + " en " + i + ", " + j);
-					replace(panelMatriz, convierteAIndice(i, j), new NaveGrafica(id, new Posicion(i,j)));;
-				}
-			}
-			
-		}
-		*/
 		
 		/*Insertando nave*/
+		System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getX() + ", " + TableroGrafico.naveGrafica.getPosicion().getY());
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getX(), TableroGrafico.naveGrafica.getPosicion().getY()), TableroGrafico.naveGrafica);
+		
+		actualizaPosicionesAgentes();
+		
+		/*Iterar sobre lista de agentes*/
+		for(int i=0; i < TableroGrafico.listaAgentesGraficos.size(); i++){
+			AgenteGrafico temp = TableroGrafico.listaAgentesGraficos.get(i);
+			System.out.println("Encontre agente con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+		}
+		
 		/*Iterar sobre lista de obstaculos*/
 		for(int i=0; i < TableroGrafico.listaObstaculosGraficos.size(); i++){
 			ObstaculoGrafico temp = TableroGrafico.listaObstaculosGraficos.get(i);
 			System.out.println("Encontre obstaculo con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
 		}
-		
 		/*Iterar sobre lista de monticulos*/
 		for(int i=0; i < TableroGrafico.listaMonticulosGraficos.size(); i++){
 			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);
@@ -150,25 +128,43 @@ public class TableroGrafico {
 	}
 	
 	public void agregaObjetosAListas(){
-		for(int j=0; j < Tablero.matriz.length; j++){
-			for(int i = 0; i < Tablero.matriz.length; i++){
-				char tipo = Tablero.matriz[i][j].charAt(0);
-				String id = Tablero.matriz[i][j].substring(1);
-				if(tipo == 'A')
-					TableroGrafico.listaAgentesGraficos.add(new AgenteGrafico(tipo+id, new Posicion(i,j)));
-				else if(tipo == 'O')
-					TableroGrafico.listaObstaculosGraficos.add(new ObstaculoGrafico(tipo+id, new Posicion(i,j)));
-				else if(tipo == 'M')
-					TableroGrafico.listaMonticulosGraficos.add(new MonticuloGrafico(tipo+id, new Posicion(i,j)));
-				else if(tipo == 'N')
-					naveGrafica = new NaveGrafica(tipo+id, new Posicion(i,j));
-			}
+		
+		/*Agregando nave*/
+		TableroGrafico.naveGrafica = new NaveGrafica(Tablero.nave.getId(), Tablero.nave.getPosicion());
+		
+		/*Agregando agentes*/
+		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			Agente temp = Tablero.listaAgentes.get(i);
+			TableroGrafico.listaAgentesGraficos.add(new AgenteGrafico(temp.getId()));
+		}
+		
+		/*Agregando obstaculos*/
+		for(int i=0; i < Tablero.listaObstaculos.size(); i++){
+			Obstaculo temp = Tablero.listaObstaculos.get(i);
+			TableroGrafico.listaObstaculosGraficos.add(new ObstaculoGrafico(temp.getId(), temp.getPosicion()));
+		}
+		/*Agregando monticulos*/
+		for(int i=0; i < Tablero.listaMonticulos.size(); i++){
+			Monticulo temp = Tablero.listaMonticulos.get(i);
+			TableroGrafico.listaMonticulosGraficos.add(new MonticuloGrafico(temp.getId(), temp.getPosicion()));
 		}
 	}
+	
+	public static void actualizaPosicionesAgentes(){
+		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(
+					Tablero.listaAgentes.get(i).getPosicion());
+		}
+	}
+	
 	public static void main(String[] args){
 		Tablero tb = new Tablero();
 		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
-		
+		int x = 10;
+		while(x > 0){
+			tb.listaAgentes.get(0).caminar();
+			x--;
+		}
 	}		
 }

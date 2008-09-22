@@ -9,9 +9,9 @@ import mx.itesm.cem.explorador.Posicion;
 
 public class AgenteGrafico extends ElementoGrafico implements ActionListener {
 	
-	public AgenteGrafico(String id, Posicion pos){
+	public AgenteGrafico(String id){
 		this.id = id;
-		this.posicion = pos;
+		this.setPosicion(TableroGrafico.naveGrafica.getPosicion());
 		this.imagen = new ImageIcon(getClass().getResource("dog.png"));
 		this.setIcon(imagen);		
 	}
