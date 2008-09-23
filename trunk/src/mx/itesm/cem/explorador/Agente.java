@@ -85,19 +85,19 @@ public class Agente {
 				casillaAEvaluar = Tablero.matriz[i+1][j+1];
 				break;
 			}
-		case DIAG_INF_IZQ:
+		case DIAG_SUP_DER:
 			if(i<Tablero.CASILLAS && j>0){
 				nuevaPosicion = new Posicion(i+1,j-1);
 				casillaAEvaluar = Tablero.matriz[i+1][j-1];
 				break;
 			}
-		case ABAJO:
+		case DERECHA:
 			if(i<Tablero.CASILLAS){
 				nuevaPosicion = new Posicion(i+1,j);
 				casillaAEvaluar = Tablero.matriz[i+1][j];
 				break;
 			}
-		case DIAG_SUP_DER:
+		case DIAG_INF_IZQ:
 			if(i>0 && j<Tablero.CASILLAS){
 				nuevaPosicion = new Posicion(i-1,j+1);
 				casillaAEvaluar = Tablero.matriz[i-1][j+1];
@@ -109,13 +109,13 @@ public class Agente {
 				casillaAEvaluar = Tablero.matriz[i-1][j-1];
 				break;
 			}
-		case ARRIBA:
+		case IZQUIERDA:
 			if(i>0){
 				nuevaPosicion = new Posicion(i-1,j);
 				casillaAEvaluar = Tablero.matriz[i-1][j];
 				break;
 			}
-		case DERECHA:
+		case ABAJO:
 			if(j < Tablero.CASILLAS ){
 
 				nuevaPosicion = new Posicion(i,j+1);
@@ -123,7 +123,7 @@ public class Agente {
 				break;
 			}
 
-		case IZQUIERDA:
+		case ARRIBA:
 			if(j>0){
 				nuevaPosicion = new Posicion(i,j-1);
 				casillaAEvaluar = Tablero.matriz[i][j-1];

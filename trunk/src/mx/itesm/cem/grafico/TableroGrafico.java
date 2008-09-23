@@ -161,10 +161,12 @@ public class TableroGrafico {
 		Tablero tb = new Tablero();
 		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
-		int x = 10;
-		while(x > 0){
+		int x = 0;
+		while(x < 10){
 			tb.listaAgentes.get(0).caminar();
-			x--;
+			tg.actualizaTablero();
+			x++;
 		}
+		
 	}		
 }
