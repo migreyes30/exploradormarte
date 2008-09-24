@@ -71,72 +71,76 @@ public class Agente {
 	 				1 | 2 | 0
 	 */
 	public ResultadoCaminar caminar(){
-		int i = this.posicion.getX();
-		int j = this.posicion.getY();
+		int i = this.posicion.getI();
+		int j = this.posicion.getJ();
 
-		int movimiento = (int)(Math.random()*9);
-		Object casillaAEvaluar = null;
+		int movimiento = (int)(Math.random()*8);
+		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 
 		switch (movimiento) {
 		case DIAG_INF_DER:
-			if (i<Tablero.CASILLAS && j<Tablero.CASILLAS){
+			if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 				nuevaPosicion =new Posicion(i+1,j+1);
 				casillaAEvaluar = Tablero.matriz[i+1][j+1];
-				break;
 			}
-		case DIAG_SUP_DER:
-			if(i<Tablero.CASILLAS && j>0){
+			break;
+		case DIAG_INF_IZQ:
+			if(i<Tablero.CASILLAS-1 && j>0){
 				nuevaPosicion = new Posicion(i+1,j-1);
 				casillaAEvaluar = Tablero.matriz[i+1][j-1];
-				break;
 			}
-		case DERECHA:
-			if(i<Tablero.CASILLAS){
+			break;
+		case ABAJO:
+			if(i<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i+1,j);
 				casillaAEvaluar = Tablero.matriz[i+1][j];
-				break;
 			}
-		case DIAG_INF_IZQ:
-			if(i>0 && j<Tablero.CASILLAS){
+			break;
+		case DIAG_SUP_DER:
+			if(i>0 && j<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i-1,j+1);
 				casillaAEvaluar = Tablero.matriz[i-1][j+1];
-				break;
 			}
+			break;
 		case DIAG_SUP_IZQ:
 			if(i>0 && j>0){
 				nuevaPosicion = new Posicion(i-1,j-1);
 				casillaAEvaluar = Tablero.matriz[i-1][j-1];
-				break;
 			}
-		case IZQUIERDA:
+			break;
+		case ARRIBA:
 			if(i>0){
 				nuevaPosicion = new Posicion(i-1,j);
 				casillaAEvaluar = Tablero.matriz[i-1][j];
-				break;
 			}
-		case ABAJO:
-			if(j < Tablero.CASILLAS ){
+			break;
+		case DERECHA:
+			if(j < Tablero.CASILLAS -1 ){
 
 				nuevaPosicion = new Posicion(i,j+1);
 				casillaAEvaluar = Tablero.matriz[i][j+1];
-				break;
 			}
+			break;
 
-		case ARRIBA:
+		case IZQUIERDA:
 			if(j>0){
 				nuevaPosicion = new Posicion(i,j-1);
 				casillaAEvaluar = Tablero.matriz[i][j-1];
-				break;
 			}
+			break;
 		default:
-			casillaAEvaluar = null;
+			casillaAEvaluar = "-";
+			System.out.println(movimiento);
+			System.out.println("Vali pito! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			break;
 		}
 
-		if(casillaAEvaluar == null){
+		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion);
-			casillaAEvaluar = this;
-			Tablero.matriz[i][j] = null;
+			System.out.println("ESTOY AHORA EN [" + this.getPosicion().getI() + ", " + this.getPosicion().getJ() +"]");
+//			casillaAEvaluar = this;
+//			Tablero.matriz[i][j] = "-";
 			this.setResultado(nuevaPosicion, true, null);
 
 		}else{
@@ -162,8 +166,8 @@ public class Agente {
 
 	/*TODO*/
 	public boolean regresarANave(){
-		int xRelativa = Tablero.posicionNave.getX() - this.getPosicion().getX();
-		int yRelativa = Tablero.posicionNave.getY() - this.getPosicion().getY();
+		int xRelativa = Tablero.posicionNave.getI() - this.getPosicion().getI();
+		int yRelativa = Tablero.posicionNave.getJ() - this.getPosicion().getJ();
 
 		if(xRelativa == 0){
 			if(yRelativa<0){
@@ -224,8 +228,8 @@ public class Agente {
 	}
 
 	public boolean evitarObstaculo(){
-		int x = this.posicion.getX();
-		int y = this.posicion.getY();
+		int x = this.posicion.getI();
+		int y = this.posicion.getJ();
 		int movimiento = 0;
 
 		Object casillaAEvaluar = null;
@@ -356,8 +360,8 @@ public class Agente {
 	}
 
 	public ResultadoCaminar caminar(int movimiento){
-		int i = this.posicion.getX();
-		int j = this.posicion.getY();
+		int i = this.posicion.getI();
+		int j = this.posicion.getJ();
 
 		Object casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;

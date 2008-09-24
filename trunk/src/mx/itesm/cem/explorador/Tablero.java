@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Dictionary;
 
 import mx.itesm.cem.explorador.exception.NoExisteElementoException;
+import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Tablero {
 	
@@ -60,7 +61,7 @@ public class Tablero {
 			}
 		}
 		
-		int xAzar, yAzar,
+		int iAzar, jAzar,
 			cantAgente = 1,
 			cantMonticulo = 10,
 			cantObstaculo = 40;
@@ -69,24 +70,24 @@ public class Tablero {
 		 *Insertando Nave
 		 *---------------------
 		 */
-		xAzar = (int)(Math.random()* CASILLAS);
-		yAzar = (int)(Math.random()* CASILLAS);
+		iAzar = (int)(Math.random()* CASILLAS);
+		jAzar = (int)(Math.random()* CASILLAS);
 		
-		mat[xAzar][yAzar] = "N" + (int)(Math.random()*35536);
-		nave = new Nave(mat[xAzar][yAzar], new Posicion(xAzar, yAzar));
+		mat[iAzar][jAzar] = "N" + (int)(Math.random()*35536);
+		nave = new Nave(mat[iAzar][jAzar], new Posicion(iAzar, jAzar));
 		Tablero.posicionNave = nave.getPosicion();
 		/*-----------------------*/
 		
 		/*Insertando Monticulos*/
 		while(cantMonticulo > 0){
-			xAzar = (int)(Math.random()* CASILLAS);
-			yAzar = (int)(Math.random()* CASILLAS);
+			iAzar = (int)(Math.random()* CASILLAS);
+			jAzar = (int)(Math.random()* CASILLAS);
 			
-			if(mat[xAzar][yAzar] == "-"){
+			if(mat[iAzar][jAzar] == "-"){
 				String id = "M" + (int)(Math.random()*35536);
-				mat[xAzar][yAzar] = id;
+				mat[iAzar][jAzar] = id;
 				Tablero.listaMonticulos.add(new Monticulo(id, 
-													new Posicion(xAzar,yAzar)));
+													new Posicion(iAzar,jAzar)));
 				cantMonticulo--;
 			}
 			
@@ -94,14 +95,14 @@ public class Tablero {
 		
 		/*Insertando Obstaculos*/
 		while(cantObstaculo > 0){
-			xAzar = (int)(Math.random()* CASILLAS);
-			yAzar = (int)(Math.random()* CASILLAS);
+			iAzar = (int)(Math.random()* CASILLAS);
+			jAzar = (int)(Math.random()* CASILLAS);
 			
-			if(mat[xAzar][yAzar] == "-"){
+			if(mat[iAzar][jAzar] == "-"){
 				String id = "O" + (int)(Math.random()*35536);
-				mat[xAzar][yAzar] = id;
+				mat[iAzar][jAzar] = id;
 				Tablero.listaObstaculos.add(new Obstaculo(id, 
-													new Posicion(xAzar,yAzar)));
+													new Posicion(iAzar,jAzar)));
 				cantObstaculo--;
 			}
 			
@@ -160,8 +161,8 @@ public class Tablero {
 	
 	public String toString(){
 		String res = "";	
-		for(int j=0; j < Tablero.matriz.length; j++){
-			for(int i = 0; i < Tablero.matriz.length; i++){
+		for(int i=0; i < Tablero.matriz.length; i++){
+			for(int j = 0; j < Tablero.matriz.length; j++){
 				res += Tablero.matriz[i][j];
 			}
 			res += "\n";
@@ -172,6 +173,8 @@ public class Tablero {
 	public static void main(String[] args){
 		Tablero t = new Tablero();
 		System.out.println(t.toString());
+		Posicion p = TableroGrafico.convierteAPosicion(224);
+		System.out.println("" + p.getI() + ", " + p.getJ());
 		
 	}
 		

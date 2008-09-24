@@ -57,7 +57,7 @@ public class TableroGrafico {
 		panelMatriz.setSize(600, 600);
 		
 		for(int j=0; j < 225; j++){
-			JLabel x = new JLabel("" + j);
+			JLabel x = new JLabel("");
 			x.setSize(40,40);
 			panelMatriz.add(x);
 		}
@@ -67,7 +67,7 @@ public class TableroGrafico {
 		panelDerecha.add(labelFondo, new Integer(1));
 		panelDerecha.add(panelMatriz, new Integer(2));
 		
-		actualizaTablero();
+		inicializaTablero();
 		
 		frame.getContentPane().add(BorderLayout.CENTER, panelDerecha);
 		//frame.getContentPane().add(BorderLayout.WEST, panelMenu);
@@ -76,57 +76,61 @@ public class TableroGrafico {
 		frame.setVisible(true);
 	}
 	
-	public Posicion convierteAPosicion(int i){
-		int x,y;
-		if(i%Tablero.CASILLAS == 0){
-			y = i/Tablero.CASILLAS;
-			x = Tablero.CASILLAS - 1;
+	public static Posicion convierteAPosicion(int index){
+		index = index+1;
+		int i,j;
+		if(index%Tablero.CASILLAS== 0){
+			i = index/Tablero.CASILLAS - 1;
+			j = Tablero.CASILLAS - 1;
 		}
 		else{
-			y = (i / Tablero.CASILLAS) + 1;
-			x = (i%Tablero.CASILLAS);
+			i = index / Tablero.CASILLAS;
+			j = (index%(Tablero.CASILLAS))-1;
 		}
-		return new Posicion(x,y);
+		return new Posicion(i,j);
 	}
 	
-	public int convierteAIndice(int x, int y){
-		return x + y*Tablero.CASILLAS;
+	public static int convierteAIndice(int i, int j){
+		return i*Tablero.CASILLAS + j;
 	}
 
-	public void replace(JPanel panel, int i, JLabel jl){
+	public static void replace(JPanel panel, int i, JLabel jl){
 		panel.remove(i);
 		panel.add(jl,i);
 	}
 	
-	public void actualizaTablero(){
+	public void inicializaTablero(){
 		
-		/*Insertando nave*/
-		System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getX() + ", " + TableroGrafico.naveGrafica.getPosicion().getY());
-		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getX(), TableroGrafico.naveGrafica.getPosicion().getY()), TableroGrafico.naveGrafica);
-		
-		actualizaPosicionesAgentes();
+		this.actualizaTablero();
 		
 		/*Iterar sobre lista de agentes*/
 		for(int i=0; i < TableroGrafico.listaAgentesGraficos.size(); i++){
 			AgenteGrafico temp = TableroGrafico.listaAgentesGraficos.get(i);
-			System.out.println("Encontre agente con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
-			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+			System.out.println("Encontre agente con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 		
 		/*Iterar sobre lista de obstaculos*/
 		for(int i=0; i < TableroGrafico.listaObstaculosGraficos.size(); i++){
 			ObstaculoGrafico temp = TableroGrafico.listaObstaculosGraficos.get(i);
-			System.out.println("Encontre obstaculo con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
-			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+			System.out.println("Encontre obstaculo con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 		/*Iterar sobre lista de monticulos*/
 		for(int i=0; i < TableroGrafico.listaMonticulosGraficos.size(); i++){
 			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);
-			System.out.println("Encontre monticulo con id: " + temp.getId() + " en " + temp.getPosicion().getX() + ", " + temp.getPosicion().getY());
-			replace(panelMatriz, convierteAIndice(temp.getPosicion().getX(), temp.getPosicion().getY()), temp);
+			System.out.println("Encontre monticulo con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
+			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 	}
 	
+	public void actualizaTablero(){
+		/*Insertando nave*/
+//		System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getI() + ", " + TableroGrafico.naveGrafica.getPosicion().getJ());
+		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
+		
+		actualizaPosicionesAgentes();
+	}
 	public void agregaObjetosAListas(){
 		
 		/*Agregando nave*/
@@ -152,8 +156,13 @@ public class TableroGrafico {
 	
 	public static void actualizaPosicionesAgentes(){
 		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(i).getPosicion();
+			String lalala = "" + (int)(Math.random()*255);
+			replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(lalala));
+			Posicion posNueva = Tablero.listaAgentes.get(i).getPosicion();
 			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(
 					Tablero.listaAgentes.get(i).getPosicion());
+//			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(i));
 		}
 	}
 	
@@ -162,8 +171,9 @@ public class TableroGrafico {
 		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
 		int x = 0;
-		while(x < 10){
-			tb.listaAgentes.get(0).caminar();
+		while(x < 50){
+			System.out.println("Intento num" + x);
+			Tablero.listaAgentes.get(0).caminar();
 			tg.actualizaTablero();
 			x++;
 		}
