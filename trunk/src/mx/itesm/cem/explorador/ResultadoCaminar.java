@@ -1,10 +1,20 @@
 package mx.itesm.cem.explorador;
 
+/**
+ * 
+ * Clase que describe el resultado de cada
+ * intento que hace un agente por caminar
+ * para asi conocer a donde intento moverse,
+ * si tuvo exito o no, y que cosa estaba
+ * en la casilla a la que intento moverse
+ *
+ */
+
 public class ResultadoCaminar {
 
 	private Posicion posicion;
 	private boolean exito;
-	private Object ocupacion;
+	private String ocupacion;
 
 	public Posicion getPosicion() {
 		return posicion;
@@ -18,10 +28,10 @@ public class ResultadoCaminar {
 	public void setExito(boolean exito) {
 		this.exito = exito;
 	}
-	public Object getOcupacion() {
+	public String getOcupacion() {
 		return ocupacion;
 	}
-	public void setOcupacion(Object ocupacion) {
+	public void setOcupacion(String ocupacion) {
 		this.ocupacion = ocupacion;
 	}
 
