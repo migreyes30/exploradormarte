@@ -95,8 +95,10 @@ public class TableroGrafico {
 	}
 
 	public static void replace(JPanel panel, int i, JLabel jl){
-		panel.remove(i);
+		panel.remove(i);		
 		panel.add(jl,i);
+		panel.validate();
+		
 	}
 	
 	public void inicializaTablero(){
@@ -126,7 +128,7 @@ public class TableroGrafico {
 	
 	public void actualizaTablero(){
 		/*Insertando nave*/
-//		System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getI() + ", " + TableroGrafico.naveGrafica.getPosicion().getJ());
+		//System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getI() + ", " + TableroGrafico.naveGrafica.getPosicion().getJ());
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 		
 		actualizaPosicionesAgentes();
@@ -157,12 +159,11 @@ public class TableroGrafico {
 	public static void actualizaPosicionesAgentes(){
 		for(int i=0; i < Tablero.listaAgentes.size(); i++){
 			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(i).getPosicion();
-			String lalala = "" + (int)(Math.random()*255);
-			replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(lalala));
+			//String lalala = "" + (int)(Math.random()*255);
+			replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
 			Posicion posNueva = Tablero.listaAgentes.get(i).getPosicion();
-			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(
-					Tablero.listaAgentes.get(i).getPosicion());
-//			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(i));
+			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(Tablero.listaAgentes.get(i).getPosicion());						
+			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(i));
 		}
 	}
 	
@@ -171,8 +172,8 @@ public class TableroGrafico {
 		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
 		int x = 0;
-		while(x < 50){
-			System.out.println("Intento num" + x);
+		while(x < 7000){
+			//System.out.println("Intento num" + x);
 			Tablero.listaAgentes.get(0).caminar();
 			tg.actualizaTablero();
 			x++;
