@@ -1,5 +1,7 @@
 package mx.itesm.cem.explorador;
 
+import mx.itesm.cem.grafico.TableroGrafico;
+
 public class Agente {
 	
 	private Posicion posicion;
@@ -84,7 +86,7 @@ public class Agente {
 			boolean exito = false;
 			switch (capas[i]) {
 			case 1:				
-				if (this.resultado.getOcupacion() != "-") { //Si la casilla a la que quieres moverte esta ocupada
+				if (this.resultado.getOcupacion().startsWith("O")) { //Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
 				}
@@ -107,14 +109,16 @@ public class Agente {
 				break;
 			case 4:
 				System.out.println("Ejecutando Capa 4");
+				System.out.println("Mi Posicion " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
 				exito = this.explorar();
 				break;
 			default:
 				System.out.println("Default");
 				break;
 			}
-			if (exito) { //Si una capa se ejecuto correctamente, empezar de nuevo a buscar que capa se cumple ahora
+			if (exito || i== capas.length-1) { //Si una capa se ejecuto correctamente, empezar de nuevo a buscar que capa se cumple ahora
 				i = 0;
+				TableroGrafico.actualizaTablero();
 			} else {
 				if(i+1 < capas.length){
 					i++; //De lo contrario, intentar con la siguiente capa	
@@ -201,7 +205,7 @@ public class Agente {
 				casillaAEvaluar = Tablero.matriz[i][j-1];
 			}
 			break;
-		default:
+		default:			
 			casillaAEvaluar = null;
 			break;
 		}
@@ -237,53 +241,53 @@ public class Agente {
 		case DIAG_INF_DER:
 			if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 				nuevaPosicion =new Posicion(i+1,j+1);
-				casillaAEvaluar = Tablero.matriz[i+1][j+1];
-				break;
+				casillaAEvaluar = Tablero.matriz[i+1][j+1];				
 			}
+			break;
 		case DIAG_INF_IZQ:
 			if(i<Tablero.CASILLAS-1 && j>0){
 				nuevaPosicion = new Posicion(i+1,j-1);
 				casillaAEvaluar = Tablero.matriz[i+1][j-1];
-				break;
 			}
+			break;
 		case ABAJO:
 			if(i<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i+1,j);
 				casillaAEvaluar = Tablero.matriz[i+1][j];
-				break;
 			}
+			break;
 		case DIAG_SUP_DER:
 			if(i>0 && j<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i-1,j+1);
 				casillaAEvaluar = Tablero.matriz[i-1][j+1];
-				break;
 			}
+			break;
 		case DIAG_SUP_IZQ:
 			if(i>0 && j>0){
 				nuevaPosicion = new Posicion(i-1,j-1);
 				casillaAEvaluar = Tablero.matriz[i-1][j-1];
-				break;
 			}
+			break;
 		case ARRIBA:
 			if(i>0){
 				nuevaPosicion = new Posicion(i-1,j);
 				casillaAEvaluar = Tablero.matriz[i-1][j];
-				break;
 			}
+			break;
 		case DERECHA:
 			if(j < Tablero.CASILLAS-1 ){
 	
 				nuevaPosicion = new Posicion(i,j+1);
 				casillaAEvaluar = Tablero.matriz[i][j+1];
-				break;
 			}
+			break;
 	
 		case IZQUIERDA:
 			if(j>0){
 				nuevaPosicion = new Posicion(i,j-1);
 				casillaAEvaluar = Tablero.matriz[i][j-1];
-				break;
 			}
+			break;
 		default:
 			/*Nunca deberia llegar aqui, pues significaria que la validacion para no salirse del tablero fallo*/
 			casillaAEvaluar = null; 

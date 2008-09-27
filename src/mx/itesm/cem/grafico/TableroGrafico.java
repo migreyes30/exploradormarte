@@ -94,8 +94,7 @@ public class TableroGrafico {
 		panel.remove(i);		
 		panel.add(jl,i);
 		panel.validate();
-		
-		
+
 	}
 	
 	public void inicializaTablero(){
@@ -120,7 +119,7 @@ public class TableroGrafico {
 		}
 	}
 	
-	public void actualizaTablero(){
+	public static void actualizaTablero(){
 		/*Insertando nave*/
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 		actualizaPosicionesAgentes();
@@ -163,12 +162,12 @@ public class TableroGrafico {
 	public static void main(String[] args){
 		Tablero tb = new Tablero();
 		System.out.println(tb.toString());
+		@SuppressWarnings("unused")
 		TableroGrafico tg = new TableroGrafico();
 		int x = 0;
 		while(x<1000){
 			int[] capas = {1,2,3,4};
 			Tablero.listaAgentes.get(0).actuar(capas);
-			tg.actualizaTablero();
 			x++;
 		}
 		
