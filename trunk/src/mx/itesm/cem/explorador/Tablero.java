@@ -88,6 +88,7 @@ public class Tablero {
 				mat[iAzar][jAzar] = id;
 				Tablero.listaMonticulos.add(new Monticulo(id, 
 													new Posicion(iAzar,jAzar)));
+				Tablero.totalPiedras += Tablero.listaMonticulos.get(Tablero.listaMonticulos.size()-1).getPiedras();
 				cantMonticulo--;
 			}
 			
@@ -116,7 +117,7 @@ public class Tablero {
 			
 			
 		}
-
+		
 		return mat;
 	}
 	

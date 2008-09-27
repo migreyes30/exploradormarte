@@ -21,6 +21,10 @@ public class Agente {
 		this.setPosicion(Tablero.posicionNave);
 		this.setCapacidad((int)(Math.random()* ((Tablero.totalPiedras/4)+1)));
 		this.setCargaActual(0);
+		
+		this.resultado.setExito(false);
+		this.resultado.setOcupacion(Tablero.nave.getId());
+		this.resultado.setPosicion(Tablero.nave.getPosicion());
 	}
 
 	public Posicion getPosicion() {
@@ -75,39 +79,46 @@ public class Agente {
  */
 	public void actuar(int[] capas){
 		int i =0;
-		boolean exito = false;
-	
+		
 		while (Tablero.piedrasNave != Tablero.totalPiedras) {
-	
+			boolean exito = false;
 			switch (capas[i]) {
-			case 1:
+			case 1:				
 				if (this.resultado.getOcupacion() != "-") { //Si la casilla a la que quieres moverte esta ocupada
+					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
 				}
 				break;
 			case 2:
 				if (this.cargaActual != 0) { //Si lleva piedras su prioridad es ir a la nave
-					/*TODO: Falta usar dejarPiedras*/
+					System.out.println("Ejecutando Capa 2");
+					if(this.resultado.getOcupacion() == "N"){
+						this.dejarPiedras();
+					}
 					exito = this.regresarANave();
 				}
 				break;
 			case 3:
 				if (this.resultado.getOcupacion().startsWith("M")) { //Si intentaste moverte a una casilla que tiene un monticulo
-					
+					System.out.println("Ejecutando Capa 3");
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
 					exito = this.cargar(monticulo);
 				}
 				break;
 			case 4:
-				this.explorar();
+				System.out.println("Ejecutando Capa 4");
+				exito = this.explorar();
 				break;
 			default:
+				System.out.println("Default");
 				break;
 			}
 			if (exito) { //Si una capa se ejecuto correctamente, empezar de nuevo a buscar que capa se cumple ahora
 				i = 0;
 			} else {
-				i++; //De lo contrario, intentar con la siguiente capa
+				if(i+1 < capas.length){
+					i++; //De lo contrario, intentar con la siguiente capa	
+				}
 			}
 		}
 	}
@@ -197,8 +208,6 @@ public class Agente {
 
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
-			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId(); //Colocamos al agente en el tablero, en su nueva posicion
-			Tablero.matriz[i][j] = "-"; //Liberamos la posicion anterior
 			this.setResultado(nuevaPosicion, true, "-");
 
 		}else{
@@ -226,25 +235,25 @@ public class Agente {
 	
 		switch (movimiento) {
 		case DIAG_INF_DER:
-			if (i<Tablero.CASILLAS && j<Tablero.CASILLAS){
+			if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 				nuevaPosicion =new Posicion(i+1,j+1);
 				casillaAEvaluar = Tablero.matriz[i+1][j+1];
 				break;
 			}
 		case DIAG_INF_IZQ:
-			if(i<Tablero.CASILLAS && j>0){
+			if(i<Tablero.CASILLAS-1 && j>0){
 				nuevaPosicion = new Posicion(i+1,j-1);
 				casillaAEvaluar = Tablero.matriz[i+1][j-1];
 				break;
 			}
 		case ABAJO:
-			if(i<Tablero.CASILLAS){
+			if(i<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i+1,j);
 				casillaAEvaluar = Tablero.matriz[i+1][j];
 				break;
 			}
 		case DIAG_SUP_DER:
-			if(i>0 && j<Tablero.CASILLAS){
+			if(i>0 && j<Tablero.CASILLAS-1){
 				nuevaPosicion = new Posicion(i-1,j+1);
 				casillaAEvaluar = Tablero.matriz[i-1][j+1];
 				break;
@@ -262,7 +271,7 @@ public class Agente {
 				break;
 			}
 		case DERECHA:
-			if(j < Tablero.CASILLAS ){
+			if(j < Tablero.CASILLAS-1 ){
 	
 				nuevaPosicion = new Posicion(i,j+1);
 				casillaAEvaluar = Tablero.matriz[i][j+1];
@@ -282,8 +291,6 @@ public class Agente {
 	
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion);
-			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
-			Tablero.matriz[i][j] = "-";
 			this.setResultado(nuevaPosicion, true, "-");
 	
 		}else{
@@ -312,25 +319,25 @@ public class Agente {
 		while(true){
 			switch (movimiento) {
 			case DIAG_INF_DER:
-				if (i<Tablero.CASILLAS && j<Tablero.CASILLAS){
+				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 					nuevaPosicion =new Posicion(i+1,j+1);
 					casillaAEvaluar = Tablero.matriz[i+1][j+1];
 					break;
 				}
 			case DIAG_INF_IZQ:
-				if(i<Tablero.CASILLAS && j>0){
+				if(i<Tablero.CASILLAS-1 && j>0){
 					nuevaPosicion = new Posicion(i+1,j-1);
 					casillaAEvaluar = Tablero.matriz[i+1][j-1];
 					break;
 				}
 			case ABAJO:
-				if(i<Tablero.CASILLAS){
+				if(i<Tablero.CASILLAS-1){
 					nuevaPosicion = new Posicion(i+1,j);
 					casillaAEvaluar = Tablero.matriz[i+1][j];
 					break;
 				}
 			case DIAG_SUP_DER:
-				if(i>0 && j<Tablero.CASILLAS){
+				if(i>0 && j<Tablero.CASILLAS-1){
 					nuevaPosicion = new Posicion(i-1,j+1);
 					casillaAEvaluar = Tablero.matriz[i-1][j+1];
 					break;
@@ -348,7 +355,7 @@ public class Agente {
 					break;
 				}
 			case DERECHA:
-				if(j < Tablero.CASILLAS ){
+				if(j < Tablero.CASILLAS-1 ){
 	
 					nuevaPosicion = new Posicion(i,j+1);
 					casillaAEvaluar = Tablero.matriz[i][j+1];
@@ -368,8 +375,6 @@ public class Agente {
 	
 			if(casillaAEvaluar == "-"){
 				this.setPosicion(nuevaPosicion);
-				Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
-				Tablero.matriz[i][j] = "-";
 				this.setResultado(nuevaPosicion, true, "-");
 				
 				return true;
