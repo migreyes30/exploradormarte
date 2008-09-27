@@ -1,24 +1,20 @@
 package mx.itesm.cem.grafico;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 
 import mx.itesm.cem.explorador.Agente;
 import mx.itesm.cem.explorador.Monticulo;
-import mx.itesm.cem.explorador.Nave;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
-import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 
 
 public class TableroGrafico {
@@ -99,6 +95,7 @@ public class TableroGrafico {
 		panel.add(jl,i);
 		panel.validate();
 		
+		
 	}
 	
 	public void inicializaTablero(){
@@ -108,29 +105,24 @@ public class TableroGrafico {
 		/*Iterar sobre lista de agentes*/
 		for(int i=0; i < TableroGrafico.listaAgentesGraficos.size(); i++){
 			AgenteGrafico temp = TableroGrafico.listaAgentesGraficos.get(i);
-			System.out.println("Encontre agente con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 		
 		/*Iterar sobre lista de obstaculos*/
 		for(int i=0; i < TableroGrafico.listaObstaculosGraficos.size(); i++){
-			ObstaculoGrafico temp = TableroGrafico.listaObstaculosGraficos.get(i);
-			System.out.println("Encontre obstaculo con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
+			ObstaculoGrafico temp = TableroGrafico.listaObstaculosGraficos.get(i);			
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 		/*Iterar sobre lista de monticulos*/
 		for(int i=0; i < TableroGrafico.listaMonticulosGraficos.size(); i++){
-			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);
-			System.out.println("Encontre monticulo con id: " + temp.getId() + " en " + temp.getPosicion().getI() + ", " + temp.getPosicion().getJ());
+			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);		
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
 		}
 	}
 	
 	public void actualizaTablero(){
 		/*Insertando nave*/
-		//System.out.println("Encontre nave con id: " + TableroGrafico.naveGrafica.getId() + " en " + TableroGrafico.naveGrafica.getPosicion().getI() + ", " + TableroGrafico.naveGrafica.getPosicion().getJ());
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
-		
 		actualizaPosicionesAgentes();
 	}
 	public void agregaObjetosAListas(){
@@ -158,9 +150,10 @@ public class TableroGrafico {
 	
 	public static void actualizaPosicionesAgentes(){
 		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			
 			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(i).getPosicion();
-			//String lalala = "" + (int)(Math.random()*255);
 			replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
+			
 			Posicion posNueva = Tablero.listaAgentes.get(i).getPosicion();
 			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(Tablero.listaAgentes.get(i).getPosicion());						
 			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(i));
@@ -172,9 +165,9 @@ public class TableroGrafico {
 		System.out.println(tb.toString());
 		TableroGrafico tg = new TableroGrafico();
 		int x = 0;
-		while(x < 7000){
-			//System.out.println("Intento num" + x);
-			Tablero.listaAgentes.get(0).caminar();
+		while(x<1000){
+			int[] capas = {1,2,3,4};
+			Tablero.listaAgentes.get(0).actuar(capas);
 			tg.actualizaTablero();
 			x++;
 		}
