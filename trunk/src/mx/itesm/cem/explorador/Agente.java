@@ -94,10 +94,11 @@ public class Agente {
 			case 2:
 				if (this.cargaActual != 0) { //Si lleva piedras su prioridad es ir a la nave
 					System.out.println("Ejecutando Capa 2");
-					if(this.resultado.getOcupacion() == "N"){
-						this.dejarPiedras();
-					}
 					exito = this.regresarANave();
+					if(this.resultado.getOcupacion().startsWith("N")){
+						this.dejarPiedras();
+						exito = true;
+					}
 				}
 				break;
 			case 3:
@@ -153,63 +154,64 @@ public class Agente {
 		int movimiento = (int)(Math.random()*8);
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
-
-		switch (movimiento) {
-		case DIAG_INF_DER:
-			if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
-				nuevaPosicion =new Posicion(i+1,j+1);
-				casillaAEvaluar = Tablero.matriz[i+1][j+1];
+		
+		while(casillaAEvaluar == null){
+			switch (movimiento) {
+			case DIAG_INF_DER:
+				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
+					nuevaPosicion =new Posicion(i+1,j+1);
+					casillaAEvaluar = Tablero.matriz[i+1][j+1];
+				}
+				break;
+			case DIAG_INF_IZQ:
+				if(i<Tablero.CASILLAS-1 && j>0){
+					nuevaPosicion = new Posicion(i+1,j-1);
+					casillaAEvaluar = Tablero.matriz[i+1][j-1];
+				}
+				break;
+			case ABAJO:
+				if(i<Tablero.CASILLAS-1){
+					nuevaPosicion = new Posicion(i+1,j);
+					casillaAEvaluar = Tablero.matriz[i+1][j];
+				}
+				break;
+			case DIAG_SUP_DER:
+				if(i>0 && j<Tablero.CASILLAS-1){
+					nuevaPosicion = new Posicion(i-1,j+1);
+					casillaAEvaluar = Tablero.matriz[i-1][j+1];
+				}
+				break;
+			case DIAG_SUP_IZQ:
+				if(i>0 && j>0){
+					nuevaPosicion = new Posicion(i-1,j-1);
+					casillaAEvaluar = Tablero.matriz[i-1][j-1];
+				}
+				break;
+			case ARRIBA:
+				if(i>0){
+					nuevaPosicion = new Posicion(i-1,j);
+					casillaAEvaluar = Tablero.matriz[i-1][j];
+				}
+				break;
+			case DERECHA:
+				if(j < Tablero.CASILLAS -1 ){
+	
+					nuevaPosicion = new Posicion(i,j+1);
+					casillaAEvaluar = Tablero.matriz[i][j+1];
+				}
+				break;
+	
+			case IZQUIERDA:
+				if(j>0){
+					nuevaPosicion = new Posicion(i,j-1);
+					casillaAEvaluar = Tablero.matriz[i][j-1];
+				}
+				break;
+			default:			
+				casillaAEvaluar = null;
+				break;
 			}
-			break;
-		case DIAG_INF_IZQ:
-			if(i<Tablero.CASILLAS-1 && j>0){
-				nuevaPosicion = new Posicion(i+1,j-1);
-				casillaAEvaluar = Tablero.matriz[i+1][j-1];
-			}
-			break;
-		case ABAJO:
-			if(i<Tablero.CASILLAS-1){
-				nuevaPosicion = new Posicion(i+1,j);
-				casillaAEvaluar = Tablero.matriz[i+1][j];
-			}
-			break;
-		case DIAG_SUP_DER:
-			if(i>0 && j<Tablero.CASILLAS-1){
-				nuevaPosicion = new Posicion(i-1,j+1);
-				casillaAEvaluar = Tablero.matriz[i-1][j+1];
-			}
-			break;
-		case DIAG_SUP_IZQ:
-			if(i>0 && j>0){
-				nuevaPosicion = new Posicion(i-1,j-1);
-				casillaAEvaluar = Tablero.matriz[i-1][j-1];
-			}
-			break;
-		case ARRIBA:
-			if(i>0){
-				nuevaPosicion = new Posicion(i-1,j);
-				casillaAEvaluar = Tablero.matriz[i-1][j];
-			}
-			break;
-		case DERECHA:
-			if(j < Tablero.CASILLAS -1 ){
-
-				nuevaPosicion = new Posicion(i,j+1);
-				casillaAEvaluar = Tablero.matriz[i][j+1];
-			}
-			break;
-
-		case IZQUIERDA:
-			if(j>0){
-				nuevaPosicion = new Posicion(i,j-1);
-				casillaAEvaluar = Tablero.matriz[i][j-1];
-			}
-			break;
-		default:			
-			casillaAEvaluar = null;
-			break;
 		}
-
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 			this.setResultado(nuevaPosicion, true, "-");
@@ -237,62 +239,64 @@ public class Agente {
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 	
-		switch (movimiento) {
-		case DIAG_INF_DER:
-			if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
-				nuevaPosicion =new Posicion(i+1,j+1);
-				casillaAEvaluar = Tablero.matriz[i+1][j+1];				
+		while(casillaAEvaluar == null){
+			switch (movimiento) {
+			case DIAG_INF_DER:
+				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
+					nuevaPosicion =new Posicion(i+1,j+1);
+					casillaAEvaluar = Tablero.matriz[i+1][j+1];				
+				}
+				break;
+			case DIAG_INF_IZQ:
+				if(i<Tablero.CASILLAS-1 && j>0){
+					nuevaPosicion = new Posicion(i+1,j-1);
+					casillaAEvaluar = Tablero.matriz[i+1][j-1];
+				}
+				break;
+			case ABAJO:
+				if(i<Tablero.CASILLAS-1){
+					nuevaPosicion = new Posicion(i+1,j);
+					casillaAEvaluar = Tablero.matriz[i+1][j];
+				}
+				break;
+			case DIAG_SUP_DER:
+				if(i>0 && j<Tablero.CASILLAS-1){
+					nuevaPosicion = new Posicion(i-1,j+1);
+					casillaAEvaluar = Tablero.matriz[i-1][j+1];
+				}
+				break;
+			case DIAG_SUP_IZQ:
+				if(i>0 && j>0){
+					nuevaPosicion = new Posicion(i-1,j-1);
+					casillaAEvaluar = Tablero.matriz[i-1][j-1];
+				}
+				break;
+			case ARRIBA:
+				if(i>0){
+					nuevaPosicion = new Posicion(i-1,j);
+					casillaAEvaluar = Tablero.matriz[i-1][j];
+				}
+				break;
+			case DERECHA:
+				if(j < Tablero.CASILLAS-1 ){
+		
+					nuevaPosicion = new Posicion(i,j+1);
+					casillaAEvaluar = Tablero.matriz[i][j+1];
+				}
+				break;
+		
+			case IZQUIERDA:
+				if(j>0){
+					nuevaPosicion = new Posicion(i,j-1);
+					casillaAEvaluar = Tablero.matriz[i][j-1];
+				}
+				break;
+			default:
+				/*Nunca deberia llegar aqui, pues significaria que la validacion para no salirse del tablero fallo*/
+				casillaAEvaluar = null; 
 			}
-			break;
-		case DIAG_INF_IZQ:
-			if(i<Tablero.CASILLAS-1 && j>0){
-				nuevaPosicion = new Posicion(i+1,j-1);
-				casillaAEvaluar = Tablero.matriz[i+1][j-1];
-			}
-			break;
-		case ABAJO:
-			if(i<Tablero.CASILLAS-1){
-				nuevaPosicion = new Posicion(i+1,j);
-				casillaAEvaluar = Tablero.matriz[i+1][j];
-			}
-			break;
-		case DIAG_SUP_DER:
-			if(i>0 && j<Tablero.CASILLAS-1){
-				nuevaPosicion = new Posicion(i-1,j+1);
-				casillaAEvaluar = Tablero.matriz[i-1][j+1];
-			}
-			break;
-		case DIAG_SUP_IZQ:
-			if(i>0 && j>0){
-				nuevaPosicion = new Posicion(i-1,j-1);
-				casillaAEvaluar = Tablero.matriz[i-1][j-1];
-			}
-			break;
-		case ARRIBA:
-			if(i>0){
-				nuevaPosicion = new Posicion(i-1,j);
-				casillaAEvaluar = Tablero.matriz[i-1][j];
-			}
-			break;
-		case DERECHA:
-			if(j < Tablero.CASILLAS-1 ){
-	
-				nuevaPosicion = new Posicion(i,j+1);
-				casillaAEvaluar = Tablero.matriz[i][j+1];
-			}
-			break;
-	
-		case IZQUIERDA:
-			if(j>0){
-				nuevaPosicion = new Posicion(i,j-1);
-				casillaAEvaluar = Tablero.matriz[i][j-1];
-			}
-			break;
-		default:
-			/*Nunca deberia llegar aqui, pues significaria que la validacion para no salirse del tablero fallo*/
-			casillaAEvaluar = null; 
 		}
-	
+		
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion);
 			this.setResultado(nuevaPosicion, true, "-");
@@ -399,62 +403,62 @@ public class Agente {
 	 * @return
 	 */
 	public boolean regresarANave(){
-		int iRelativa = Tablero.posicionNave.getI() - this.getPosicion().getI();
-		int jRelativa = Tablero.posicionNave.getJ() - this.getPosicion().getJ();
+		int iRelativa = this.getPosicion().getI() - Tablero.posicionNave.getI(); 
+		int jRelativa = this.getPosicion().getJ() - Tablero.posicionNave.getJ();
 	
 		if(iRelativa == 0){
 			if(jRelativa<0){
-				this.caminar(DERECHA);
+				return this.caminar(DERECHA).isExito();
 			}else{
-				this.caminar(IZQUIERDA);
+				return this.caminar(IZQUIERDA).isExito();
 			}
 		}
 	
 		if(jRelativa == 0){
 			if(iRelativa<0){
-				this.caminar(ABAJO);
+				return this.caminar(ABAJO).isExito();
 			}else{
-				this.caminar(ARRIBA);
+				return this.caminar(ARRIBA).isExito();
 			}
 		}
 	
 		if(iRelativa < 0){
 			if(jRelativa<0){
 				//1,2,4
-				if(this.caminar(DIAG_SUP_IZQ).isExito()){
+				if(this.caminar(DIAG_INF_DER).isExito()){
 					return true;
-				}else if (this.caminar(IZQUIERDA).isExito()) {
+				}else if (this.caminar(DERECHA).isExito()) {
 					return true;
 				}else{
-					return this.caminar(ARRIBA).isExito();
+					return this.caminar(ABAJO).isExito();
 				}
 	
 			}else{
 				//2,3,5
-				if(this.caminar(DIAG_SUP_DER).isExito()){
-					return true;
-				}else if (this.caminar(ARRIBA).isExito()){
-					return true;
-				}else{
-					return this.caminar(DERECHA).isExito();
-				}
-			}
-		}else{
-			if(jRelativa<0){
 				if(this.caminar(DIAG_INF_IZQ).isExito()){
 					return true;
-				}else if(this.caminar(IZQUIERDA).isExito()){
+				}else if (this.caminar(IZQUIERDA).isExito()){
 					return true;
 				}else{
 					return this.caminar(ABAJO).isExito();
 				}
-			}else{
-				if(this.caminar(DIAG_INF_DER).isExito()){
+			}
+		}else {
+			if(jRelativa<0){
+				if(this.caminar(DIAG_SUP_DER).isExito()){
 					return true;
 				}else if(this.caminar(DERECHA).isExito()){
 					return true;
 				}else{
-					return this.caminar(ABAJO).isExito();
+					return this.caminar(ARRIBA).isExito();
+				}
+			}else{
+				if(this.caminar(DIAG_SUP_IZQ).isExito()){
+					return true;
+				}else if(this.caminar(IZQUIERDA).isExito()){
+					return true;
+				}else{
+					return this.caminar(ARRIBA).isExito();
 				}
 			}
 		}
