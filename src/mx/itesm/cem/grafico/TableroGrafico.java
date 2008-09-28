@@ -120,9 +120,9 @@ public class TableroGrafico {
 	}
 	
 	public static void actualizaTablero(){
+		actualizaPosicionesAgentes();
 		/*Insertando nave*/
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
-		actualizaPosicionesAgentes();
 	}
 	public void agregaObjetosAListas(){
 		
@@ -164,12 +164,19 @@ public class TableroGrafico {
 		System.out.println(tb.toString());
 		@SuppressWarnings("unused")
 		TableroGrafico tg = new TableroGrafico();
-		int x = 0;
-		while(x<1000){
-			int[] capas = {1,2,3,4};
-			Tablero.listaAgentes.get(0).actuar(capas);
-			x++;
-		}
+		int[] capas = {1,2,3,4};
+		Tablero.listaAgentes.get(0).actuar(capas);
+	}
+/*	private class Actuar implements Runnable{
+		int[] capas = null;
 		
-	}		
+		public void run(){
+			tiraACliente(-1);
+		}
+		public Actuar(int[] capas){
+			this.capas = capas;
+			new Thread(this).start();
+		}
+	}
+*/
 }
