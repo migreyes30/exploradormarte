@@ -63,8 +63,8 @@ public class Tablero {
 		
 		int iAzar, jAzar,
 			cantAgente = 1,
-			cantMonticulo = 10,
-			cantObstaculo = 40;
+			cantMonticulo = 1,
+			cantObstaculo = 20;
 		
 		/*----------------------
 		 *Insertando Nave

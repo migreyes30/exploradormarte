@@ -5,7 +5,7 @@ import mx.itesm.cem.grafico.TableroGrafico;
 public class Agente {
 	
 	private Posicion posicion;
-	private int capacidad;
+	private int capacidad = 0;
 	private int cargaActual;
 	private String id;
 	private ResultadoCaminar resultado = new ResultadoCaminar();
@@ -21,7 +21,8 @@ public class Agente {
 	public Agente(String id){
 		this.setId(id);
 		this.setPosicion(Tablero.posicionNave);
-		this.setCapacidad((int)(Math.random()* ((Tablero.totalPiedras/4)+1)));
+		while(this.getCapacidad() == 0)
+			this.setCapacidad((int)(Math.random()* ((Tablero.totalPiedras/4)+1)));
 		this.setCargaActual(0);
 		
 		this.resultado.setExito(false);
@@ -126,6 +127,7 @@ public class Agente {
 				}
 			}
 		}
+		System.out.println("YA SE TERMINARON LAS PIEDRAS");
 	}
 
 /**
@@ -150,12 +152,12 @@ public class Agente {
 	public ResultadoCaminar caminar(){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
-
-		int movimiento = (int)(Math.random()*8);
+		
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 		
 		while(casillaAEvaluar == null){
+			int movimiento = (int)(Math.random()*8);
 			switch (movimiento) {
 			case DIAG_INF_DER:
 				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
@@ -469,8 +471,14 @@ public class Agente {
 		if(cupo == 0 || monticulo.getPiedras()==0){
 			return false;
 		}
-		monticulo.setPiedras(monticulo.getPiedras() - cupo);
-		this.setCargaActual(this.getCargaActual() + cupo);
+		if(cupo >= monticulo.getPiedras()){
+			this.setCargaActual(monticulo.getPiedras()+this.getCargaActual());
+			monticulo.setPiedras(0);
+		}
+		else{
+			this.setCargaActual(cupo + this.getCargaActual());
+			monticulo.setPiedras(monticulo.getPiedras() - cupo);
+		}
 		return true;
 	}
 
