@@ -62,9 +62,9 @@ public class Tablero {
 		}
 		
 		int iAzar, jAzar,
-			cantAgente = 1,
-			cantMonticulo = 1,
-			cantObstaculo = 20;
+			cantAgente = 15,
+			cantMonticulo = 5,
+			cantObstaculo = 10;
 		
 		/*----------------------
 		 *Insertando Nave
@@ -178,5 +178,5 @@ public class Tablero {
 		System.out.println("" + p.getI() + ", " + p.getJ());
 		
 	}
-		
+			
 }
