@@ -25,7 +25,6 @@ public class Tablero {
 	 */
 	
 	public static String[][] matriz;
-	String fondo; //Imagen; despues tenemos que usar la clase Image
 	int[] capas;
 	public static int totalPiedras;
 	public static int piedrasNave;
@@ -62,9 +61,9 @@ public class Tablero {
 		}
 		
 		int iAzar, jAzar,
-			cantAgente = 15,
+			cantAgente = 10,
 			cantMonticulo = 5,
-			cantObstaculo = 10;
+			cantObstaculo = 15;
 		
 		/*----------------------
 		 *Insertando Nave
@@ -160,6 +159,35 @@ public class Tablero {
 		}
 	}
 	
+	public static int obtenerIndiceDeObjeto(String id){
+		char tipo = id.charAt(0);
+		switch(tipo){
+			case 'A':
+				for(int i=0; i < Tablero.listaAgentes.size(); i++){
+					Agente temp = Tablero.listaAgentes.get(i);
+					if(temp.getId() == id)
+						return i;
+				}
+				
+			case 'M':
+				for(int i=0; i < Tablero.listaMonticulos.size(); i++){
+					Monticulo temp = Tablero.listaMonticulos.get(i);
+					if(temp.getId() == id)
+						return i;
+				}
+				
+			case 'O':
+				for(int i=0; i < Tablero.listaObstaculos.size(); i++){
+					Obstaculo temp = Tablero.listaObstaculos.get(i);
+					if(temp.getId() == id)
+						return i;
+				}
+				
+			default:
+				throw new NoExisteElementoException("Id no existente o invalido");
+		}
+	}
+	
 	public String toString(){
 		String res = "";	
 		for(int i=0; i < Tablero.matriz.length; i++){
@@ -169,14 +197,6 @@ public class Tablero {
 			res += "\n";
 		}
 		return res;
-	}
-	
-	public static void main(String[] args){
-		Tablero t = new Tablero();
-		System.out.println(t.toString());
-		Posicion p = TableroGrafico.convierteAPosicion(224);
-		System.out.println("" + p.getI() + ", " + p.getJ());
-		
 	}
 			
 }
