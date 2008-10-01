@@ -15,6 +15,7 @@ import mx.itesm.cem.explorador.Monticulo;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
+import mx.itesm.cem.explorador.ThreadAgente;
 
 
 public class TableroGrafico {
@@ -90,7 +91,7 @@ public class TableroGrafico {
 		return i*Tablero.CASILLAS + j;
 	}
 
-	public static void replace(JPanel panel, int i, JLabel jl){
+	public synchronized static void replace(JPanel panel, int i, JLabel jl){
 		panel.remove(i);		
 		panel.add(jl,i);
 		panel.validate();
@@ -119,12 +120,12 @@ public class TableroGrafico {
 		}
 	}
 	
-	public static void actualizaTablero(){
+	public synchronized static void actualizaTablero(){
 		actualizaPosicionesAgentes();
 		/*Insertando nave*/
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 	}
-	public void agregaObjetosAListas(){
+	public synchronized void agregaObjetosAListas(){
 		
 		/*Agregando nave*/
 		TableroGrafico.naveGrafica = new NaveGrafica(Tablero.nave.getId(), Tablero.nave.getPosicion());
@@ -147,7 +148,7 @@ public class TableroGrafico {
 		}
 	}
 	
-	public static void actualizaPosicionesAgentes(){
+	public synchronized static void actualizaPosicionesAgentes(){
 		for(int i=0; i < Tablero.listaAgentes.size(); i++){
 			
 			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(i).getPosicion();
@@ -164,8 +165,12 @@ public class TableroGrafico {
 		System.out.println(tb.toString());
 		@SuppressWarnings("unused")
 		TableroGrafico tg = new TableroGrafico();
-		int[] capas = {1,2,3,4};
-		Tablero.listaAgentes.get(0).actuar(capas);
+		
+		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			new ThreadAgente(Tablero.listaAgentes.get(i));
+		}
+		System.out.println("LISTO!");
+		
 	}
 /*	private class Actuar implements Runnable{
 		int[] capas = null;
@@ -179,4 +184,5 @@ public class TableroGrafico {
 		}
 	}
 */
+	
 }

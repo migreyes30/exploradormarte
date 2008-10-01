@@ -50,7 +50,7 @@ public class Agente {
 		return cargaActual;
 	}
 
-	public void setCargaActual(int cargaActual) {
+	public synchronized void setCargaActual(int cargaActual) {
 		this.cargaActual = cargaActual;
 	}
 
@@ -62,11 +62,11 @@ public class Agente {
 		this.id = id;
 	}
 
-	public ResultadoCaminar getResultado() {
+	public synchronized ResultadoCaminar getResultado() {
 		return resultado;
 	}
 
-	public void setResultado(Posicion nuevaPosicion, boolean exito, String ocupacion) {
+	public synchronized void setResultado(Posicion nuevaPosicion, boolean exito, String ocupacion) {
 		this.resultado.setPosicion(nuevaPosicion);
 		this.resultado.setExito(exito);
 		this.resultado.setOcupacion(ocupacion);
@@ -80,11 +80,12 @@ public class Agente {
  * @param capas Arreglo que contiene las capas en orden de importancia
  * 
  */
-	public void actuar(int[] capas){
+	public synchronized void actuar(int[] capas){
 		int i =0;
-		
-		while (Tablero.piedrasNave != Tablero.totalPiedras) {
-			boolean exito = false;
+		boolean exito = false;
+		while(!exito){
+			if(i >= capas.length)
+				i = 0;
 			switch (capas[i]) {
 			case 1:				
 				if (this.resultado.getOcupacion().startsWith("O")) { //Si la casilla a la que quieres moverte esta ocupada
@@ -111,23 +112,17 @@ public class Agente {
 				break;
 			case 4:
 				System.out.println("Ejecutando Capa 4");
-				System.out.println("Mi Posicion " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
+				System.out.println("Posicion " + this.getId() + ": " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
 				exito = this.explorar();
 				break;
 			default:
 				System.out.println("Default");
 				break;
-			}
-			if (exito || i== capas.length-1) { //Si una capa se ejecuto correctamente, empezar de nuevo a buscar que capa se cumple ahora
-				i = 0;
-				TableroGrafico.actualizaTablero();
-			} else {
-				if(i+1 < capas.length){
-					i++; //De lo contrario, intentar con la siguiente capa	
-				}
-			}
+			} 
+			TableroGrafico.actualizaTablero();
+			i++; //De lo contrario, intentar con la siguiente capa	
+			
 		}
-		System.out.println("YA SE TERMINARON LAS PIEDRAS");
 	}
 
 /**
@@ -136,7 +131,7 @@ public class Agente {
  * esto le permite explorar su entorno.
  * @return
  */
-	public boolean explorar(){
+	public synchronized boolean explorar(){
 		this.caminar();
 		return this.resultado.isExito();
 	}
@@ -149,7 +144,7 @@ public class Agente {
 	 				---------
 	 				1 | 2 | 0
 	 */
-	public ResultadoCaminar caminar(){
+	public synchronized ResultadoCaminar caminar(){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
 		
@@ -234,7 +229,7 @@ public class Agente {
  * @return
  */
 		
-	public ResultadoCaminar caminar(int movimiento){
+	public synchronized ResultadoCaminar caminar(int movimiento){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
 	
@@ -317,7 +312,7 @@ public class Agente {
 	 * 
 	 * @return
 	 */
-	public boolean evitarObstaculo(){
+	public synchronized boolean evitarObstaculo(){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
 		int movimiento = 0;
@@ -404,7 +399,7 @@ public class Agente {
 	 * 
 	 * @return
 	 */
-	public boolean regresarANave(){
+	public synchronized boolean regresarANave(){
 		int iRelativa = this.getPosicion().getI() - Tablero.posicionNave.getI(); 
 		int jRelativa = this.getPosicion().getJ() - Tablero.posicionNave.getJ();
 	
@@ -466,7 +461,7 @@ public class Agente {
 		}
 	}
 
-	public boolean cargar(Monticulo monticulo){
+	public synchronized boolean cargar(Monticulo monticulo){
 		int cupo = this.getCapacidad() - this.getCargaActual();
 		if(cupo == 0 || monticulo.getPiedras()==0){
 			return false;
@@ -482,22 +477,22 @@ public class Agente {
 		return true;
 	}
 
-	public boolean dejarPiedras(){
+	public synchronized boolean dejarPiedras(){
 		Tablero.piedrasNave += this.getCargaActual();
 		this.setCargaActual(0);
 		return true;
 	}
 
 	/* Se implementara en la segunda fase **/
-	public boolean dejarMoronas(){
+	public synchronized boolean dejarMoronas(){
 		return false;
 	}
 
-	public boolean seguirMoronas(){
+	public synchronized boolean seguirMoronas(){
 		return false;
 	}
 
-	public boolean comerMoronas(){
+	public synchronized boolean comerMoronas(){
 		return false;
 	}
 
