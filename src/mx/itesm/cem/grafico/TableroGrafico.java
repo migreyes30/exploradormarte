@@ -100,7 +100,8 @@ public class TableroGrafico {
 	
 	public void inicializaTablero(){
 		
-		this.actualizaTablero();
+		/*Insertando nave*/
+		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 		
 		/*Iterar sobre lista de agentes*/
 		for(int i=0; i < TableroGrafico.listaAgentesGraficos.size(); i++){
@@ -120,11 +121,6 @@ public class TableroGrafico {
 		}
 	}
 	
-	public synchronized static void actualizaTablero(){
-		actualizaPosicionesAgentes();
-		/*Insertando nave*/
-		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
-	}
 	public synchronized void agregaObjetosAListas(){
 		
 		/*Agregando nave*/
@@ -148,41 +144,29 @@ public class TableroGrafico {
 		}
 	}
 	
-	public synchronized static void actualizaPosicionesAgentes(){
-		for(int i=0; i < Tablero.listaAgentes.size(); i++){
-			
-			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(i).getPosicion();
-			replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
-			
-			Posicion posNueva = Tablero.listaAgentes.get(i).getPosicion();
-			TableroGrafico.listaAgentesGraficos.get(i).setPosicion(Tablero.listaAgentes.get(i).getPosicion());						
-			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(i));
-		}
+	public synchronized static void actualizaPosicionAgente(String idAgente){
+		int indiceAgente = Tablero.obtenerIndiceDeObjeto(idAgente);
+		
+		Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(indiceAgente).getPosicion();
+		replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
+		
+		Posicion posNueva = Tablero.listaAgentes.get(indiceAgente).getPosicion();
+		TableroGrafico.listaAgentesGraficos.get(indiceAgente).setPosicion(Tablero.listaAgentes.get(indiceAgente).getPosicion());						
+		replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(indiceAgente));
+		
+		/*Insertando nave*/
+		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
+		
+		panelMatriz.repaint();
 	}
 	
 	public static void main(String[] args){
 		Tablero tb = new Tablero();
 		System.out.println(tb.toString());
-		@SuppressWarnings("unused")
 		TableroGrafico tg = new TableroGrafico();
 		
-		for(int i=0; i < Tablero.listaAgentes.size(); i++){
-			new ThreadAgente(Tablero.listaAgentes.get(i));
-		}
-		System.out.println("LISTO!");
-		
+		for(int i=0; i < Tablero.listaAgentes.size(); i++)
+			new ThreadAgente(Tablero.listaAgentes.get(i));		
 	}
-/*	private class Actuar implements Runnable{
-		int[] capas = null;
-		
-		public void run(){
-			tiraACliente(-1);
-		}
-		public Actuar(int[] capas){
-			this.capas = capas;
-			new Thread(this).start();
-		}
-	}
-*/
-	
+
 }

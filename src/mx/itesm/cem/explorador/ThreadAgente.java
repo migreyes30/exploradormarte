@@ -15,7 +15,7 @@ public class ThreadAgente implements Runnable{
 		while(Tablero.piedrasNave != Tablero.totalPiedras){
 			agente.actuar(capas);
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 
 			}

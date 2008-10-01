@@ -98,6 +98,7 @@ public class Agente {
 					System.out.println("Ejecutando Capa 2");
 					exito = this.regresarANave();
 					if(this.resultado.getOcupacion().startsWith("N")){
+						//System.out.print(this.getId() + ": deje " + this.getCargaActual() + " piedras\n");
 						this.dejarPiedras();
 						exito = true;
 					}
@@ -107,7 +108,13 @@ public class Agente {
 				if (this.resultado.getOcupacion().startsWith("M")) { //Si intentaste moverte a una casilla que tiene un monticulo
 					System.out.println("Ejecutando Capa 3");
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
+					System.out.print(this.getId() + ": ");
 					exito = this.cargar(monticulo);
+					/*if(!exito)
+						System.out.print("NOOOOOOOOOOOOOOO ");
+					System.out.print("PUDE CARGAR " + monticulo.getPiedras() + " PIEDRAS!!! Aun me caben: " + (this.getCapacidad() -
+							this.getCargaActual()) + "\n");
+					*/
 				}
 				break;
 			case 4:
@@ -116,10 +123,9 @@ public class Agente {
 				exito = this.explorar();
 				break;
 			default:
-				System.out.println("Default");
+				//System.out.println("Default");
 				break;
 			} 
-			TableroGrafico.actualizaTablero();
 			i++; //De lo contrario, intentar con la siguiente capa	
 			
 		}
@@ -133,6 +139,7 @@ public class Agente {
  */
 	public synchronized boolean explorar(){
 		this.caminar();
+		TableroGrafico.actualizaPosicionAgente(this.getId());
 		return this.resultado.isExito();
 	}
 
