@@ -36,21 +36,16 @@ public class Tablero {
 	public static ArrayList<Monticulo> listaMonticulos = new ArrayList<Monticulo>();
 	public static ArrayList<Obstaculo> listaObstaculos = new ArrayList<Obstaculo>();
 	
-	
 	public Tablero(int numMonticulos, int numObstaculos, int numAgentes){
-		
 		
 		Tablero.NUM_MONTICULOS = numMonticulos;
 		Tablero.NUM_OBSTACULOS = numObstaculos;
 		Tablero.NUM_AGENTES = numAgentes;
-		
-		//Constructor del tablero
-		Tablero.matriz = creaMatriz();
-		
-		
+
+		Tablero.matriz = creaMatriz();		
 	}
 	
-	public boolean isTerminado(){
+	public static boolean isTerminado(){
 		if(Tablero.piedrasNave == totalPiedras)
 			return true;
 		else
@@ -85,7 +80,6 @@ public class Tablero {
 		/*-----------------------*/
 		
 		/*Insertando Monticulos*/
-		
 		while(cantMonticulo > 0){
 			iAzar = (int)(Math.random()* CASILLAS);
 			jAzar = (int)(Math.random()* CASILLAS);

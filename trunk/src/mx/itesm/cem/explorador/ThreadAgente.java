@@ -1,5 +1,7 @@
 package mx.itesm.cem.explorador;
 
+import java.util.Date;
+
 public class ThreadAgente implements Runnable{
 	Thread t;
 	private Agente agente;
@@ -12,7 +14,9 @@ public class ThreadAgente implements Runnable{
 	}
 	
 	public void run(){
-		while(Tablero.piedrasNave != Tablero.totalPiedras){
+		
+		long start = new Date().getTime();
+		while(!Tablero.isTerminado()){
 			agente.actuar(capas);
 			try {
 				Thread.sleep(500);
@@ -20,6 +24,8 @@ public class ThreadAgente implements Runnable{
 
 			}
 		}
-		System.out.println("LISTO!" + this.agente.getId());
+		
+		System.out.println(this.agente.getId() + ": took " + 
+				(new Date().getTime() - start)/1000 + " seconds");
 	}
 }

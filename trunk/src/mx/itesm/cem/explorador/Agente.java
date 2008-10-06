@@ -1,5 +1,7 @@
 package mx.itesm.cem.explorador;
 
+import javax.swing.JLabel;
+
 import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Agente {
@@ -91,6 +93,8 @@ public class Agente {
 				if (this.resultado.getOcupacion().startsWith("O")) { //Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
+					
+					
 				}
 				break;
 			case 2:
@@ -110,8 +114,9 @@ public class Agente {
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
 					System.out.print(this.getId() + ": ");
 					exito = this.cargar(monticulo);
-					/*if(!exito)
-						System.out.print("NOOOOOOOOOOOOOOO ");
+					if(exito)
+						TableroGrafico.replace(TableroGrafico.panelPiedras, TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(), monticulo.getPosicion().getJ()), new JLabel(monticulo.getPiedras()+""));
+						/*System.out.print("NOOOOOOOOOOOOOOO ");
 					System.out.print("PUDE CARGAR " + monticulo.getPiedras() + " PIEDRAS!!! Aun me caben: " + (this.getCapacidad() -
 							this.getCargaActual()) + "\n");
 					*/
@@ -139,7 +144,7 @@ public class Agente {
  */
 	public synchronized boolean explorar(){
 		this.caminar();
-		TableroGrafico.actualizaPosicionAgente(this.getId());
+		
 		return this.resultado.isExito();
 	}
 
@@ -219,6 +224,7 @@ public class Agente {
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 			this.setResultado(nuevaPosicion, true, "-");
+			TableroGrafico.actualizaPosicionAgente(this.getId());
 
 		}else{
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
@@ -304,6 +310,7 @@ public class Agente {
 		if(casillaAEvaluar == "-"){
 			this.setPosicion(nuevaPosicion);
 			this.setResultado(nuevaPosicion, true, "-");
+			TableroGrafico.actualizaPosicionAgente(this.getId());
 	
 		}else{
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
@@ -388,7 +395,7 @@ public class Agente {
 			if(casillaAEvaluar == "-"){
 				this.setPosicion(nuevaPosicion);
 				this.setResultado(nuevaPosicion, true, "-");
-				
+				TableroGrafico.actualizaPosicionAgente(this.getId());
 				return true;
 				
 			}else{

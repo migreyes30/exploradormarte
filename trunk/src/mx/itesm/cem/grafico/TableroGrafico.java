@@ -15,12 +15,12 @@ import mx.itesm.cem.explorador.Monticulo;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
+import mx.itesm.cem.explorador.ThreadAgente;
 
 
 public class TableroGrafico{
 	
-	
-	public static JPanel panelMatriz;
+	public static JPanel panelMatriz,panelPiedras;
 	public static JFrame frame;
 	public static JPanel panelMenu;
 	public static JLayeredPane panelDerecha;
@@ -34,16 +34,18 @@ public class TableroGrafico{
 											new ArrayList<ObstaculoGrafico>();
 	
 	public TableroGrafico(){
-				
+			
 		frame = new JFrame("Explorador Marte");
-		frame.setSize(800, 635);
+		frame.setSize(650,670);
 		panelMenu = new JPanel();
 		panelDerecha = new JLayeredPane();
 		
 		panelMatriz = new JPanel();
+		panelPiedras = new JPanel();
 		
 		frame.getContentPane().setLayout(new BorderLayout());		
 		panelMatriz.setLayout(new GridLayout(15,15));
+		panelPiedras.setLayout(new GridLayout(15,15));
 		
 		ImageIcon fondo = new ImageIcon(getClass().getResource("Mars_atmosphere.jpg"));
 		JLabel labelFondo = new JLabel(fondo);
@@ -52,24 +54,28 @@ public class TableroGrafico{
 		panelMenu.setBackground(new Color(255,0,0));
 		panelMenu.setSize(200,600);
 		panelMatriz.setOpaque(false);
-		panelMatriz.setSize(600, 600);
+		panelMatriz.setSize(630, 630);
+		
+		panelPiedras.setOpaque(false);
+		panelPiedras.setSize(panelMatriz.getSize());
 		
 		for(int j=0; j < 225; j++){
 			JLabel x = new JLabel("");
+			JLabel y = new JLabel("");
 			x.setSize(40,40);
 			panelMatriz.add(x);
+			panelPiedras.add(y);
 		}
 		
 		agregaObjetosAListas();
 		
 		panelDerecha.add(labelFondo, new Integer(1));
 		panelDerecha.add(panelMatriz, new Integer(2));
+		panelDerecha.add(panelPiedras,new Integer(3));
 		
 		inicializaTablero();
 		
 		frame.getContentPane().add(BorderLayout.CENTER, panelDerecha);
-		//frame.getContentPane().add(BorderLayout.WEST, panelMenu);
-		//frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
@@ -108,6 +114,7 @@ public class TableroGrafico{
 		for(int i=0; i < TableroGrafico.listaAgentesGraficos.size(); i++){
 			AgenteGrafico temp = TableroGrafico.listaAgentesGraficos.get(i);
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
+			replace(panelPiedras, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), new JLabel(Tablero.listaAgentes.get(i).getCargaActual()+""));
 		}
 		
 		/*Iterar sobre lista de obstaculos*/
@@ -119,6 +126,7 @@ public class TableroGrafico{
 		for(int i=0; i < TableroGrafico.listaMonticulosGraficos.size(); i++){
 			MonticuloGrafico temp = TableroGrafico.listaMonticulosGraficos.get(i);		
 			replace(panelMatriz, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), temp);
+			replace(panelPiedras, convierteAIndice(temp.getPosicion().getI(), temp.getPosicion().getJ()), new JLabel(Tablero.listaMonticulos.get(i).getPiedras()+""));
 		}
 	}
 	
@@ -151,23 +159,24 @@ public class TableroGrafico{
 		Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(indiceAgente).getPosicion();
 		replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
 		
+		replace(panelPiedras, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
+		
 		Posicion posNueva = Tablero.listaAgentes.get(indiceAgente).getPosicion();
 		TableroGrafico.listaAgentesGraficos.get(indiceAgente).setPosicion(Tablero.listaAgentes.get(indiceAgente).getPosicion());						
 		replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(indiceAgente));
+
+		replace(panelPiedras, convierteAIndice(Tablero.listaAgentes.get(indiceAgente).getPosicion().getI(), Tablero.listaAgentes.get(indiceAgente).getPosicion().getJ()), new JLabel(Tablero.listaAgentes.get(indiceAgente).getCargaActual()+""));
 		
 		/*Insertando nave*/
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 		
 		panelMatriz.repaint();
+		panelPiedras.repaint();
 	}
 	
 	public static void main(String[] args){
-		
 		@SuppressWarnings("unused")
 		PantallaDeBienvenida bienvenida = new PantallaDeBienvenida();
-				
-	}
-	
-		
 
+	}
 }
