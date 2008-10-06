@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 
 import mx.itesm.cem.explorador.Posicion;
 
+@SuppressWarnings("serial")
 public class ElementoGrafico extends JLabel{
 	
 	protected Posicion posicion;

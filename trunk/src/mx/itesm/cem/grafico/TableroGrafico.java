@@ -2,12 +2,15 @@ package mx.itesm.cem.grafico;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import mx.itesm.cem.explorador.Agente;
@@ -18,7 +21,8 @@ import mx.itesm.cem.explorador.Tablero;
 import mx.itesm.cem.explorador.ThreadAgente;
 
 
-public class TableroGrafico {
+public class TableroGrafico{
+	
 	
 	public static JPanel panelMatriz;
 	public static JFrame frame;
@@ -34,6 +38,7 @@ public class TableroGrafico {
 											new ArrayList<ObstaculoGrafico>();
 	
 	public TableroGrafico(){
+				
 		frame = new JFrame("Explorador Marte");
 		frame.setSize(800, 635);
 		panelMenu = new JPanel();
@@ -161,12 +166,11 @@ public class TableroGrafico {
 	}
 	
 	public static void main(String[] args){
-		Tablero tb = new Tablero();
-		System.out.println(tb.toString());
-		TableroGrafico tg = new TableroGrafico();
 		
-		for(int i=0; i < Tablero.listaAgentes.size(); i++)
-			new ThreadAgente(Tablero.listaAgentes.get(i));		
+		PantallaDeBienvenida bienvenida = new PantallaDeBienvenida();
+				
 	}
+	
+		
 
 }

@@ -1,11 +1,8 @@
 package mx.itesm.cem.explorador;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
 
 import mx.itesm.cem.explorador.exception.NoExisteElementoException;
-import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Tablero {
 	
@@ -26,6 +23,10 @@ public class Tablero {
 	
 	public static String[][] matriz;
 	int[] capas;
+	
+	public static int NUM_MONTICULOS;
+	public static int NUM_OBSTACULOS;
+	public static int NUM_AGENTES;
 	public static int totalPiedras;
 	public static int piedrasNave;
 	public static final int CASILLAS = 15;
@@ -36,7 +37,13 @@ public class Tablero {
 	public static ArrayList<Obstaculo> listaObstaculos = new ArrayList<Obstaculo>();
 	
 	
-	public Tablero(){
+	public Tablero(int numMonticulos, int numObstaculos, int numAgentes){
+		
+		
+		Tablero.NUM_MONTICULOS = numMonticulos;
+		Tablero.NUM_OBSTACULOS = numObstaculos;
+		Tablero.NUM_AGENTES = numAgentes;
+		
 		//Constructor del tablero
 		Tablero.matriz = creaMatriz();
 		
@@ -60,10 +67,10 @@ public class Tablero {
 			}
 		}
 		
-		int iAzar, jAzar,
-			cantAgente = 10,
-			cantMonticulo = 5,
-			cantObstaculo = 15;
+		int iAzar, jAzar;
+		int cantAgente = Tablero.NUM_AGENTES;
+		int	cantMonticulo = Tablero.NUM_MONTICULOS;
+		int cantObstaculo = Tablero.NUM_OBSTACULOS;
 		
 		/*----------------------
 		 *Insertando Nave
@@ -78,6 +85,7 @@ public class Tablero {
 		/*-----------------------*/
 		
 		/*Insertando Monticulos*/
+		
 		while(cantMonticulo > 0){
 			iAzar = (int)(Math.random()* CASILLAS);
 			jAzar = (int)(Math.random()* CASILLAS);
@@ -85,8 +93,7 @@ public class Tablero {
 			if(mat[iAzar][jAzar] == "-"){
 				String id = "M" + (int)(Math.random()*35536);
 				mat[iAzar][jAzar] = id;
-				Tablero.listaMonticulos.add(new Monticulo(id, 
-													new Posicion(iAzar,jAzar)));
+				Tablero.listaMonticulos.add(new Monticulo(id, new Posicion(iAzar,jAzar)));
 				Tablero.totalPiedras += Tablero.listaMonticulos.get(Tablero.listaMonticulos.size()-1).getPiedras();
 				cantMonticulo--;
 			}
@@ -120,7 +127,7 @@ public class Tablero {
 		return mat;
 	}
 	
-	/* Método para obtener un elemento con su id.
+	/** Método para obtener un elemento con su id.
 	 * 
 	 * Se debe hacer un cast cuando se mande a llamar este metodo
 	 * Por ejemplo:

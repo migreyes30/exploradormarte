@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 
 import mx.itesm.cem.explorador.Posicion;
 
+@SuppressWarnings("serial")
 public class MonticuloGrafico extends ElementoGrafico implements ActionListener {
 	
 	public MonticuloGrafico(String id, Posicion pos){
