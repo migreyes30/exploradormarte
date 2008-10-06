@@ -1,6 +1,6 @@
 package mx.itesm.cem.explorador;
 
-import java.util.ArrayList;
+
 
 public class Monticulo {
 	private Posicion posicion;

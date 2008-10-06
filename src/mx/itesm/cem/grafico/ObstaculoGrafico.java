@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 
 import mx.itesm.cem.explorador.Posicion;
 
+@SuppressWarnings("serial")
 public class ObstaculoGrafico extends ElementoGrafico implements ActionListener {
 	
 	public ObstaculoGrafico(String id, Posicion pos){
