@@ -18,7 +18,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 	private static final int LIMITE_CARACTERES = 6;
 	private static final int ANCHO_TEXTFIELD = 50;
 	private static final int ALTO_TEXTFIELD = 20;
-	public Box opcionesBox, entradasBox, botonesBox, tituloBox;
+	public Box tituloBox, opcionesBox, entradasBox, capasBox, botonesBox ;
 	public JPanel botonesPanel;
 	public JButton aceptarButton, borrarButton;
 	public JTextField monticulosTxt, obstaculosTxt, agentesTxt  = new JTextField("");
@@ -37,10 +37,13 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		this.tituloBox = Box.createHorizontalBox();
 		this.opcionesBox = Box.createVerticalBox();
 		this.entradasBox = Box.createVerticalBox();
+		this.capasBox = Box.createHorizontalBox();
 		this.botonesBox = Box.createHorizontalBox();
-		this.tituloBox = Box.createHorizontalBox();
+		
+		
 		
 		this.botonesPanel = new JPanel();
 		
@@ -64,17 +67,17 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		agentesTxt.setDocument(new JTextFieldLimit(LIMITE_CARACTERES));
 		agentesTxt.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
 		
+			
+		this.tituloBox.add(Box.createVerticalStrut(60));
+		this.tituloBox.add(tituloLabel);
+		
 		this.aceptarButton = new JButton("Aceptar");
 		this.aceptarButton.addActionListener(this);
 		
 		this.borrarButton = new JButton("Limpiar");
 		this.borrarButton.addActionListener(this);
 				
-		
-		this.tituloBox.add(Box.createVerticalStrut(60));
-		this.tituloBox.add(tituloLabel);
-		
-	
+			
 		this.opcionesBox.add(monticulosLabel);
 		this.opcionesBox.add(Box.createRigidArea(new Dimension(20,45)));
 		this.opcionesBox.add(obstaculosLabel);
@@ -87,6 +90,8 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.entradasBox.add(obstaculosTxt);
 		this.entradasBox.add(Box.createRigidArea(new Dimension(20,40)));
 		this.entradasBox.add(agentesTxt);
+		
+		
 		
 		this.botonesBox.add(aceptarButton);
 		this.botonesBox.add(Box.createRigidArea(new Dimension(20,40)));
