@@ -174,6 +174,16 @@ public class TableroGrafico{
 		panelPiedras.repaint();
 	}
 	
+	public synchronized static void quitaMonticulo(String idMonticulo){
+		int indiceMonticulo = Tablero.obtenerIndiceDeObjeto(idMonticulo);
+		
+		Posicion pos = Tablero.listaMonticulos.get(indiceMonticulo).getPosicion();
+		replace(panelMatriz, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
+		replace(panelPiedras, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
+		
+		panelPiedras.repaint();
+		panelMatriz.repaint();
+	}
 	public static void main(String[] args){
 		@SuppressWarnings("unused")
 		PantallaDeBienvenida bienvenida = new PantallaDeBienvenida();
