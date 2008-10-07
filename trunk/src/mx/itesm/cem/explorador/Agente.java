@@ -114,7 +114,7 @@ public class Agente {
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
 					System.out.print(this.getId() + ": ");
 					exito = this.cargar(monticulo);
-					if(exito)
+					if(exito && monticulo.getPiedras() != 0)
 						TableroGrafico.replace(TableroGrafico.panelPiedras, TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(), monticulo.getPosicion().getJ()), new JLabel(monticulo.getPiedras()+""));
 						/*System.out.print("NOOOOOOOOOOOOOOO ");
 					System.out.print("PUDE CARGAR " + monticulo.getPiedras() + " PIEDRAS!!! Aun me caben: " + (this.getCapacidad() -
@@ -419,17 +419,25 @@ public class Agente {
 	
 		if(iRelativa == 0){
 			if(jRelativa<0){
-				return this.caminar(DERECHA).isExito();
+				if(!this.caminar(DERECHA).isExito())
+					return this.caminar().isExito();
+				else return true;
 			}else{
-				return this.caminar(IZQUIERDA).isExito();
+				if(!this.caminar(IZQUIERDA).isExito())
+					return this.caminar().isExito();
+				else return true;
 			}
 		}
 	
 		if(jRelativa == 0){
 			if(iRelativa<0){
-				return this.caminar(ABAJO).isExito();
+				if(!this.caminar(ABAJO).isExito())
+					return this.caminar().isExito();
+				else return true;
 			}else{
-				return this.caminar(ARRIBA).isExito();
+				if(!this.caminar(ARRIBA).isExito())
+					return this.caminar().isExito();
+				else return true;
 			}
 		}
 	
@@ -440,9 +448,10 @@ public class Agente {
 					return true;
 				}else if (this.caminar(DERECHA).isExito()) {
 					return true;
-				}else{
-					return this.caminar(ABAJO).isExito();
+				}else if (this.caminar(ABAJO).isExito()){
+					return true; 
 				}
+				else return this.caminar().isExito();
 	
 			}else{
 				//2,3,5
@@ -450,8 +459,10 @@ public class Agente {
 					return true;
 				}else if (this.caminar(IZQUIERDA).isExito()){
 					return true;
+				}else if (this.caminar(ABAJO).isExito()){
+					return true;
 				}else{
-					return this.caminar(ABAJO).isExito();
+					return this.caminar().isExito();
 				}
 			}
 		}else {
@@ -460,16 +471,20 @@ public class Agente {
 					return true;
 				}else if(this.caminar(DERECHA).isExito()){
 					return true;
+				}else if(this.caminar(ARRIBA).isExito()){
+					return true;
 				}else{
-					return this.caminar(ARRIBA).isExito();
+					return this.caminar().isExito();
 				}
 			}else{
 				if(this.caminar(DIAG_SUP_IZQ).isExito()){
 					return true;
 				}else if(this.caminar(IZQUIERDA).isExito()){
 					return true;
+				}else if(this.caminar(ARRIBA).isExito()){
+					return true;
 				}else{
-					return this.caminar(ARRIBA).isExito();
+					return this.caminar().isExito();
 				}
 			}
 		}
@@ -482,11 +497,16 @@ public class Agente {
 		}
 		if(cupo >= monticulo.getPiedras()){
 			this.setCargaActual(monticulo.getPiedras()+this.getCargaActual());
-			monticulo.setPiedras(0);
+			monticulo.setPiedras(0);			
 		}
 		else{
 			this.setCargaActual(cupo + this.getCargaActual());
 			monticulo.setPiedras(monticulo.getPiedras() - cupo);
+		}
+		
+		if(monticulo.getPiedras() == 0){
+			TableroGrafico.quitaMonticulo(monticulo.getId());
+			Tablero.matriz[monticulo.getPosicion().getI()][monticulo.getPosicion().getJ()] = "-";
 		}
 		return true;
 	}

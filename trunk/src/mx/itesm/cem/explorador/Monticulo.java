@@ -5,12 +5,13 @@ package mx.itesm.cem.explorador;
 public class Monticulo {
 	private Posicion posicion;
 	private String id;
-	int piedras;
+	int piedras = 0;
 	
 	public Monticulo(String id, Posicion pos){
 		this.setId(id);
 		this.setPosicion(pos);
-		this.setPiedras((int)(Math.random()*20));
+		while(this.getPiedras() == 0)
+			this.setPiedras((int)(Math.random()*21));
 	}
 
 	public Posicion getPosicion() {
