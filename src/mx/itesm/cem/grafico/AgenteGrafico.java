@@ -15,7 +15,6 @@ public class AgenteGrafico extends ElementoGrafico implements ActionListener {
 		this.setIcon(imagen);		
 	}
 	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
 		
 	}
 }
