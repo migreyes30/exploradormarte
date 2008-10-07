@@ -5,10 +5,12 @@ import java.util.Date;
 public class ThreadAgente implements Runnable{
 	Thread t;
 	private Agente agente;
-	int[] capas = {1,2,3,4};
+	private int[] capas;
 	
-	public ThreadAgente(Agente agente){
+	
+	public ThreadAgente(Agente agente, int[] capas){
 		this.agente = agente;
+		this.capas = capas;
 		t = new Thread(this);
 		t.start();
 	}
