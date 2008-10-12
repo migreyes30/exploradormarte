@@ -136,10 +136,10 @@ public class TableroGrafico{
 		/*Agregando nave*/
 		TableroGrafico.naveGrafica = new NaveGrafica(Tablero.nave.getId(), Tablero.nave.getPosicion());
 		
-		/*Agregando agentes*/
-		for(int i=0; i < Tablero.listaAgentes.size(); i++){
-			Agente temp = Tablero.listaAgentes.get(i);
-			TableroGrafico.listaAgentesGraficos.add(new AgenteGrafico(temp.getId()));
+		/*Agregando monticulos*/
+		for(int i=0; i < Tablero.listaMonticulos.size(); i++){
+			Monticulo temp = Tablero.listaMonticulos.get(i);
+			TableroGrafico.listaMonticulosGraficos.add(new MonticuloGrafico(temp.getId(), temp.getPosicion()));
 		}
 		
 		/*Agregando obstaculos*/
@@ -147,10 +147,11 @@ public class TableroGrafico{
 			Obstaculo temp = Tablero.listaObstaculos.get(i);
 			TableroGrafico.listaObstaculosGraficos.add(new ObstaculoGrafico(temp.getId(), temp.getPosicion()));
 		}
-		/*Agregando monticulos*/
-		for(int i=0; i < Tablero.listaMonticulos.size(); i++){
-			Monticulo temp = Tablero.listaMonticulos.get(i);
-			TableroGrafico.listaMonticulosGraficos.add(new MonticuloGrafico(temp.getId(), temp.getPosicion()));
+		
+		/*Agregando agentes*/
+		for(int i=0; i < Tablero.listaAgentes.size(); i++){
+			Agente temp = Tablero.listaAgentes.get(i);
+			TableroGrafico.listaAgentesGraficos.add(new AgenteGrafico(temp.getId(), temp.getPosicion()));
 		}
 	}
 	

@@ -224,19 +224,29 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 				capasIntroducidas[3]= Integer.parseInt(ordenExplorar.getSelectedItem().toString());
 				
 				if(this.validarCapas(capasIntroducidas)){
+					
 					numMonticulos = Integer.parseInt(this.monticulosTxt.getText());
 					numObstaculos = Integer.parseInt(this.obstaculosTxt.getText());
 					numAgentes = Integer.parseInt(this.agentesTxt.getText());
 					
-					this.setVisible(false);
+					if(numMonticulos == 0 || numAgentes == 0) {
+						JOptionPane.showMessageDialog(this, "Debes introducir minimo 1 agente y 1 monticulo", "Error", JOptionPane.ERROR_MESSAGE);
+					}
 					
-					Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes);
-					System.out.println(tb.toString());
-							
-					@SuppressWarnings("unused")
-					TableroGrafico tg = new TableroGrafico();
-					for(int i=0; i < Tablero.listaAgentes.size(); i++)
-						new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas );
+					else if((numMonticulos + numObstaculos + numAgentes) >= 225)
+						JOptionPane.showMessageDialog(this, "Introdujiste demasiados elementos. La suma de obstaculos, agentes y monticulos debe ser maximo de 224 elementos",
+														"Error", JOptionPane.ERROR_MESSAGE);
+					else{
+						this.setVisible(false);
+						
+						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes);
+						System.out.println(tb.toString());
+								
+						@SuppressWarnings("unused")
+						TableroGrafico tg = new TableroGrafico();
+						for(int i=0; i < Tablero.listaAgentes.size(); i++)
+							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas );
+					}
 				}else{
 					JOptionPane.showMessageDialog(this, "Dos capas no puden tener la misma prioridad", "Orden de capas", JOptionPane.ERROR_MESSAGE);	
 				}

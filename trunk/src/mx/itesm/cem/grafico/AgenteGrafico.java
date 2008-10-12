@@ -5,12 +5,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 
+import mx.itesm.cem.explorador.Posicion;
+
 @SuppressWarnings("serial")
 public class AgenteGrafico extends ElementoGrafico implements ActionListener {
 	
-	public AgenteGrafico(String id){
+	public AgenteGrafico(String id, Posicion pos){
 		this.id = id;
-		this.setPosicion(TableroGrafico.naveGrafica.getPosicion());
+		this.setPosicion(pos);
 		this.imagen = new ImageIcon(getClass().getResource("dog.png"));
 		this.setIcon(imagen);		
 	}
