@@ -28,7 +28,6 @@ public class Tablero {
 	public static int NUM_OBSTACULOS;
 	public static int NUM_AGENTES;
 	public static int totalPiedras;
-	public static int piedrasNave;
 	public static final int CASILLAS = 15;
 	public static Posicion posicionNave;
 	public static Nave nave;
@@ -46,7 +45,7 @@ public class Tablero {
 	}
 	
 	public static boolean isTerminado(){
-		if(Tablero.piedrasNave == totalPiedras)
+		if(Tablero.nave.getPiedras() == totalPiedras)
 			return true;
 		else
 			return false;
@@ -111,10 +110,16 @@ public class Tablero {
 		
 		/*Insertando Agentes*/
 		while(cantAgente > 0){
-			String id = "A" + (int)(Math.random()*35536);
-			Tablero.listaAgentes.add(new Agente(id));
-			cantAgente--;
+			iAzar = (int)(Math.random()* CASILLAS);
+			jAzar = (int)(Math.random()* CASILLAS);
 			
+			if(mat[iAzar][jAzar] == "-"){
+				String id = "A" + (int)(Math.random()*35536);
+				mat[iAzar][jAzar] = id;
+				Tablero.listaAgentes.add(new Agente(id, 
+											new Posicion(iAzar,jAzar)));
+				cantAgente--;
+			}
 			
 		}
 		
@@ -198,6 +203,15 @@ public class Tablero {
 			res += "\n";
 		}
 		return res;
+	}
+	
+	public static void imprimeTablero(){
+		for(int i=0; i < Tablero.matriz.length; i++){
+			for(int j = 0; j < Tablero.matriz.length; j++){
+				System.out.print(Tablero.matriz[i][j]);
+			}
+			System.out.println();
+		}
 	}
 			
 }

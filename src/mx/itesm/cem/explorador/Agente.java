@@ -20,16 +20,16 @@ public class Agente {
 	public static final int DIAG_INF_DER = 0;
 	public static final int DIAG_INF_IZQ = 1;
 
-	public Agente(String id){
+	public Agente(String id, Posicion pos){
 		this.setId(id);
-		this.setPosicion(Tablero.posicionNave);
+		this.setPosicion(pos);
 		while(this.getCapacidad() == 0)
 			this.setCapacidad((int)(Math.random()* ((Tablero.totalPiedras/4)+1)));
 		this.setCargaActual(0);
 		
 		this.resultado.setExito(false);
 		this.resultado.setOcupacion(Tablero.nave.getId());
-		this.resultado.setPosicion(Tablero.nave.getPosicion());
+		this.resultado.setPosicion(this.getPosicion());
 	}
 
 	public Posicion getPosicion() {
@@ -90,11 +90,10 @@ public class Agente {
 				i = 0;
 			switch (capas[i]) {
 			case 1:				
-				if (this.resultado.getOcupacion().startsWith("O")) { //Si la casilla a la que quieres moverte esta ocupada
+				if (this.resultado.getOcupacion().startsWith("O")
+						|| this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
-					
-					
 				}
 				break;
 			case 2:
@@ -114,8 +113,8 @@ public class Agente {
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
 					System.out.print(this.getId() + ": ");
 					exito = this.cargar(monticulo);
-					if(exito && monticulo.getPiedras() != 0)
-						TableroGrafico.replace(TableroGrafico.panelPiedras, TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(), monticulo.getPosicion().getJ()), new JLabel(monticulo.getPiedras()+""));
+					//if(exito && monticulo.getPiedras() != 0)
+						
 						/*System.out.print("NOOOOOOOOOOOOOOO ");
 					System.out.print("PUDE CARGAR " + monticulo.getPiedras() + " PIEDRAS!!! Aun me caben: " + (this.getCapacidad() -
 							this.getCargaActual()) + "\n");
@@ -222,6 +221,8 @@ public class Agente {
 			}
 		}
 		if(casillaAEvaluar == "-"){
+			Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 			this.setResultado(nuevaPosicion, true, "-");
 			TableroGrafico.actualizaPosicionAgente(this.getId());
@@ -308,6 +309,8 @@ public class Agente {
 		}
 		
 		if(casillaAEvaluar == "-"){
+			Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion);
 			this.setResultado(nuevaPosicion, true, "-");
 			TableroGrafico.actualizaPosicionAgente(this.getId());
@@ -393,6 +396,8 @@ public class Agente {
 			}
 	
 			if(casillaAEvaluar == "-"){
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+				Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 				this.setPosicion(nuevaPosicion);
 				this.setResultado(nuevaPosicion, true, "-");
 				TableroGrafico.actualizaPosicionAgente(this.getId());
@@ -480,13 +485,24 @@ public class Agente {
 		if(cupo == 0 || monticulo.getPiedras()==0){
 			return false;
 		}
-		if(cupo >= monticulo.getPiedras()){
-			this.setCargaActual(monticulo.getPiedras()+this.getCargaActual());
-			monticulo.setPiedras(0);			
-		}
-		else{
-			this.setCargaActual(cupo + this.getCargaActual());
-			monticulo.setPiedras(monticulo.getPiedras() - cupo);
+		
+		while(cupo > 0 && monticulo.getPiedras() > 0){
+			this.setCargaActual(this.getCargaActual() + 1);
+			monticulo.setPiedras(monticulo.getPiedras() - 1);
+			TableroGrafico.replace(TableroGrafico.panelPiedras, 
+									TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(), 
+																	monticulo.getPosicion().getJ()),
+									new JLabel(monticulo.getPiedras()+""));
+			TableroGrafico.replace(TableroGrafico.panelPiedras, 
+					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
+													this.getPosicion().getJ()),
+					new JLabel(this.getCargaActual()+""));
+			try {
+				Thread.sleep(100); // Para que tarde al cargar
+			} catch (InterruptedException e) {
+				
+			}
+			cupo--;
 		}
 		
 		if(monticulo.getPiedras() == 0){
@@ -497,8 +513,25 @@ public class Agente {
 	}
 
 	public synchronized boolean dejarPiedras(){
-		Tablero.piedrasNave += this.getCargaActual();
-		this.setCargaActual(0);
+		while(this.getCargaActual() > 0){
+			this.setCargaActual(this.getCargaActual() - 1);
+			Tablero.nave.setPiedras(Tablero.nave.getPiedras() + 1);
+			TableroGrafico.replace(TableroGrafico.panelPiedras, 
+					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
+													this.getPosicion().getJ()),
+					new JLabel(this.getCargaActual()+""));
+			try {
+				Thread.sleep(100); // Para que tarde al cargar
+			} catch (InterruptedException e) {
+				
+			}
+		}
+		
+		try {
+			Thread.sleep(100);  //Para que tarde al dejar piedras.
+		} catch (InterruptedException e) {
+			
+		}
 		return true;
 	}
 
