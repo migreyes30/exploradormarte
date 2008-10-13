@@ -218,10 +218,10 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 					&& this.obstaculosTxt.getText().length() > 0 && this.agentesTxt.getText().length() > 0){
 				
 				int[] capasIntroducidas = new int[NUM_CAPAS];
-				capasIntroducidas[0] = Integer.parseInt(ordenEvitarObstaculos.getSelectedItem().toString());
-				capasIntroducidas[1] = Integer.parseInt(ordenLlevarPiedras.getSelectedItem().toString());
-				capasIntroducidas[2] = Integer.parseInt(ordenRecolectarMuestras.getSelectedItem().toString());
-				capasIntroducidas[3]= Integer.parseInt(ordenExplorar.getSelectedItem().toString());
+				capasIntroducidas[Integer.parseInt(ordenEvitarObstaculos.getSelectedItem().toString())- 1] = 1;  	// 1 = Evitar Obstaculo
+				capasIntroducidas[Integer.parseInt(ordenLlevarPiedras.getSelectedItem().toString())- 1] = 2; 		// 2 = Regresar a nave
+				capasIntroducidas[Integer.parseInt(ordenRecolectarMuestras.getSelectedItem().toString()) - 1] = 3; 	// 3 = Cargar
+				capasIntroducidas[Integer.parseInt(ordenExplorar.getSelectedItem().toString()) - 1] = 4;			// 4 = Explorar
 				
 				if(this.validarCapas(capasIntroducidas)){
 					
@@ -240,12 +240,13 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 						this.setVisible(false);
 						
 						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes);
+						Tablero.capas = capasIntroducidas;
 						System.out.println(tb.toString());
 								
 						@SuppressWarnings("unused")
 						TableroGrafico tg = new TableroGrafico();
 						for(int i=0; i < Tablero.listaAgentes.size(); i++)
-							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas );
+							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas, tg);
 					}
 				}else{
 					JOptionPane.showMessageDialog(this, "Dos capas no puden tener la misma prioridad", "Orden de capas", JOptionPane.ERROR_MESSAGE);	
