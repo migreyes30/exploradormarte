@@ -1,6 +1,8 @@
 package mx.itesm.cem.explorador;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 
@@ -21,9 +23,7 @@ public class Tablero {
 	 * Total cuadros = 15 * 15
 	 */
 	
-	public static String[][] matriz;
-	int[] capas;
-	
+	public static String[][] matriz;	
 	public static int NUM_MONTICULOS;
 	public static int NUM_OBSTACULOS;
 	public static int NUM_AGENTES;
@@ -31,16 +31,28 @@ public class Tablero {
 	public static final int CASILLAS = 15;
 	public static Posicion posicionNave;
 	public static Nave nave;
-	public static ArrayList<Agente> listaAgentes = new ArrayList<Agente>();
-	public static ArrayList<Monticulo> listaMonticulos = new ArrayList<Monticulo>();
-	public static ArrayList<Obstaculo> listaObstaculos = new ArrayList<Obstaculo>();
+	public static ArrayList<Agente> listaAgentes;
+	public static ArrayList<Monticulo> listaMonticulos;
+	public static ArrayList<Obstaculo> listaObstaculos;
+	public static int[] capas;
+	public static Map<Integer, String> nombresCapas;
 	
 	public Tablero(int numMonticulos, int numObstaculos, int numAgentes){
 		
 		Tablero.NUM_MONTICULOS = numMonticulos;
 		Tablero.NUM_OBSTACULOS = numObstaculos;
 		Tablero.NUM_AGENTES = numAgentes;
-
+		Tablero.nombresCapas = new HashMap<Integer, String>();
+		nombresCapas.put(new Integer(1), "Evitar Obstaculo");
+		nombresCapas.put(new Integer(2), "Regresar a Nave");
+		nombresCapas.put(new Integer(3), "Cargar piedras");
+		nombresCapas.put(new Integer(4), "Explorar");
+		
+		Tablero.listaAgentes = new ArrayList<Agente>();
+		Tablero.listaMonticulos = new ArrayList<Monticulo>();
+		Tablero.listaObstaculos = new ArrayList<Obstaculo>();
+		Tablero.totalPiedras = 0;
+		
 		Tablero.matriz = creaMatriz();		
 	}
 	

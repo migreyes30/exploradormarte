@@ -1,13 +1,19 @@
 package mx.itesm.cem.grafico;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import mx.itesm.cem.explorador.Agente;
@@ -15,36 +21,42 @@ import mx.itesm.cem.explorador.Monticulo;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
+import mx.itesm.cem.explorador.ThreadAgente;
 
 
 
-public class TableroGrafico{
+public class TableroGrafico extends JFrame implements ActionListener{
 	
+	private static final long serialVersionUID = 1L;
 	public static JPanel panelMatriz,panelPiedras;
 	public static JFrame frame;
 	public static JPanel panelMenu;
-	public static JLayeredPane panelDerecha;
+	public static JLayeredPane panelTablero;
+	private JMenuBar barraMenu;
+    private JMenu archivo, ayuda;
+    private JMenuItem inicio, salir, acerca;
 	
 	public static NaveGrafica naveGrafica;
-	public static ArrayList<AgenteGrafico> listaAgentesGraficos = 
-											new ArrayList<AgenteGrafico>();
-	public static ArrayList<MonticuloGrafico> listaMonticulosGraficos = 
-											new ArrayList<MonticuloGrafico>();
-	public static ArrayList<ObstaculoGrafico> listaObstaculosGraficos = 
-											new ArrayList<ObstaculoGrafico>();
+	public static ArrayList<AgenteGrafico> listaAgentesGraficos;
+	public static ArrayList<MonticuloGrafico> listaMonticulosGraficos;
+	public static ArrayList<ObstaculoGrafico> listaObstaculosGraficos;
 	
 	public TableroGrafico(){
-			
-		frame = new JFrame("Explorador Marte");
-		frame.setSize(650,670);
+		
+		TableroGrafico.listaAgentesGraficos = new ArrayList<AgenteGrafico>();
+		TableroGrafico.listaMonticulosGraficos = new ArrayList<MonticuloGrafico>();
+		TableroGrafico.listaObstaculosGraficos = new ArrayList<ObstaculoGrafico>();
+		
+		this.setTitle("Explorador Marte");
+		this.setSize(815,695);
 		
 		panelMenu = new JPanel();
-		panelDerecha = new JLayeredPane();
+		panelTablero = new JLayeredPane();
 		
 		panelMatriz = new JPanel();
 		panelPiedras = new JPanel();
 		
-		frame.getContentPane().setLayout(new BorderLayout());		
+		this.getContentPane().setLayout(new BorderLayout());		
 		panelMatriz.setLayout(new GridLayout(15,15));
 		panelPiedras.setLayout(new GridLayout(15,15));
 		
@@ -52,8 +64,8 @@ public class TableroGrafico{
 		JLabel labelFondo = new JLabel(fondo);
 		labelFondo.setSize(fondo.getIconWidth(), fondo.getIconHeight());
 		
-		panelMenu.setBackground(new Color(255,0,0));
-		panelMenu.setSize(200,600);
+		panelMenu.setLayout(new GridLayout(10,1));
+		
 		panelMatriz.setOpaque(false);
 		panelMatriz.setSize(630, 630);
 		
@@ -70,15 +82,54 @@ public class TableroGrafico{
 		
 		agregaObjetosAListas();
 		
-		panelDerecha.add(labelFondo, new Integer(1));
-		panelDerecha.add(panelMatriz, new Integer(2));
-		panelDerecha.add(panelPiedras,new Integer(3));
+		barraMenu = new JMenuBar();
+
+        archivo = new JMenu("Archivo");
+        archivo.setMnemonic(KeyEvent.VK_A);
+        barraMenu.add(archivo);
+
+        inicio = new JMenuItem("Volver a iniciar");
+        inicio.setMnemonic(KeyEvent.VK_I);
+        inicio.addActionListener(this);
+        archivo.add(inicio);
+        
+        salir = new JMenuItem("Salir");
+        salir.setMnemonic(KeyEvent.VK_S);
+        salir.addActionListener(this);
+        archivo.add(salir);
+        
+        ayuda = new JMenu("Ayuda");
+        ayuda.setMnemonic(KeyEvent.VK_Y);
+        barraMenu.add(ayuda);
+        
+        acerca = new JMenuItem("Acerca de...");
+        acerca.setMnemonic(KeyEvent.VK_L);
+        acerca.addActionListener(this);
+        ayuda.add(acerca);
+        
+        this.setJMenuBar(barraMenu);
+        
+		panelTablero.add(labelFondo, new Integer(1));
+		panelTablero.add(panelMatriz, new Integer(2));
+		panelTablero.add(panelPiedras,new Integer(3));
 		
 		inicializaTablero();
 		
-		frame.getContentPane().add(BorderLayout.CENTER, panelDerecha);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		panelMenu.add(new JLabel("-----INFORMACION-----"));
+		panelMenu.add(new JLabel("Orden de capas"));
+		panelMenu.add(new JLabel("1. " + Tablero.nombresCapas.get(Tablero.capas[0])));
+		panelMenu.add(new JLabel("2. " + Tablero.nombresCapas.get(Tablero.capas[1])));
+		panelMenu.add(new JLabel("3. " + Tablero.nombresCapas.get(Tablero.capas[2])));
+		panelMenu.add(new JLabel("4. " + Tablero.nombresCapas.get(Tablero.capas[3])));
+		panelMenu.add(new JLabel("Numero de agentes: " + Tablero.listaAgentes.size()));
+		panelMenu.add(new JLabel("Numero de monticulos: " + Tablero.listaMonticulos.size()));
+		panelMenu.add(new JLabel("Piedras totales: " + Tablero.totalPiedras));
+		panelMenu.add(new JLabel("Piedras por dejar en nave: " + (Tablero.totalPiedras - Tablero.nave.getPiedras())));
+		
+		this.getContentPane().add(BorderLayout.CENTER, panelTablero);
+		this.getContentPane().add(BorderLayout.EAST, panelMenu);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(true);
 	}
 	
 	public static Posicion convierteAPosicion(int index){
@@ -185,5 +236,51 @@ public class TableroGrafico{
 		
 		panelPiedras.repaint();
 		panelMatriz.repaint();
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		
+		if(e.getSource() == salir){
+			int opcion = JOptionPane.showConfirmDialog(this, "¿Seguro deseas cerrar la aplicación?");
+			if(opcion == JOptionPane.YES_OPTION){
+				System.exit(0);
+			}
+			
+		}
+		
+		if(e.getSource() == inicio){
+			int opcion = JOptionPane.showConfirmDialog(this, "Se cerrará esta simulacion y volverás al inicio. ¿Estás seguro?");
+			if(opcion == JOptionPane.YES_OPTION){
+				new PantallaDeBienvenida();
+				this.setVisible(false);
+			}
+		}
+		
+		if(e.getSource() == acerca){
+			String message = "Explorador de Marte \n (C) 2008" +
+				"\nAutores: " + 
+				"\n*Eduardo Fuentes Martínez" + 
+				"\n*Jonathan Fragoso Martínez" + 
+				"\n*Maricela Obeso Pulido" + 
+				"\n*Miguel Angel Ramírez Reyes\n" + 
+				"\n ITESM CEM." +
+				"\n"+
+				"\n This work is licensed under the Creative Commons"+ 
+				 "\n Attribution-NonCommercial 2.5 License. To view a" + 
+				 "\n copy of this license, visit: " +
+				 "\n"+
+				 "\n http://creativecommons.org/licenses/by-nc/2.5/" +
+				 "\n"+
+				 "\n Or send a letter to:" +
+				 "\n" +
+				 "\n     Creative Commons"+
+				 "\n     543 Howard Street, 5th Floor"+
+				 "\n     San Francisco, CA 94105"+
+				 "\n     USA"
+				 ;
+			JOptionPane.showMessageDialog(this, message);
+			
+		}
+		
 	}
 }

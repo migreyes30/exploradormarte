@@ -332,64 +332,67 @@ public class Agente {
 	public synchronized boolean evitarObstaculo(){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
-		int movimiento = 0;
+		int movimiento = (int)(Math.random()*8);
 	
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 	
 	
 		while(true){
+			if(movimiento > 7)
+				movimiento = 0;
 			switch (movimiento) {
 			case DIAG_INF_DER:
 				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 					nuevaPosicion =new Posicion(i+1,j+1);
 					casillaAEvaluar = Tablero.matriz[i+1][j+1];
-					break;
 				}
+				break;
 			case DIAG_INF_IZQ:
 				if(i<Tablero.CASILLAS-1 && j>0){
 					nuevaPosicion = new Posicion(i+1,j-1);
 					casillaAEvaluar = Tablero.matriz[i+1][j-1];
-					break;
 				}
+				break;
 			case ABAJO:
 				if(i<Tablero.CASILLAS-1){
 					nuevaPosicion = new Posicion(i+1,j);
 					casillaAEvaluar = Tablero.matriz[i+1][j];
-					break;
 				}
+				break;
 			case DIAG_SUP_DER:
 				if(i>0 && j<Tablero.CASILLAS-1){
 					nuevaPosicion = new Posicion(i-1,j+1);
 					casillaAEvaluar = Tablero.matriz[i-1][j+1];
-					break;
 				}
+				break;
 			case DIAG_SUP_IZQ:
 				if(i>0 && j>0){
 					nuevaPosicion = new Posicion(i-1,j-1);
 					casillaAEvaluar = Tablero.matriz[i-1][j-1];
-					break;
 				}
+				break;
 			case ARRIBA:
 				if(i>0){
 					nuevaPosicion = new Posicion(i-1,j);
 					casillaAEvaluar = Tablero.matriz[i-1][j];
-					break;
 				}
+				break;
 			case DERECHA:
 				if(j < Tablero.CASILLAS-1 ){
 	
 					nuevaPosicion = new Posicion(i,j+1);
 					casillaAEvaluar = Tablero.matriz[i][j+1];
-					break;
 				}
+				break;
 	
 			case IZQUIERDA:
 				if(j>0){
 					nuevaPosicion = new Posicion(i,j-1);
 					casillaAEvaluar = Tablero.matriz[i][j-1];
-					break;
 				}
+				break;
+				
 			default:
 				this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 				return false;
@@ -520,6 +523,9 @@ public class Agente {
 					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
+			TableroGrafico.replace(TableroGrafico.panelMenu, 9, 
+					new JLabel("Piedras por dejar en nave: " + 
+							(Tablero.totalPiedras - Tablero.nave.getPiedras())));
 			try {
 				Thread.sleep(100); // Para que tarde al cargar
 			} catch (InterruptedException e) {
