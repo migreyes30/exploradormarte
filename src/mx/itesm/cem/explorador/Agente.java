@@ -1,7 +1,8 @@
 package mx.itesm.cem.explorador;
 
+import java.util.ArrayList;
 import javax.swing.JLabel;
-
+import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Agente {
@@ -19,6 +20,7 @@ public class Agente {
 	public static final int DIAG_SUP_IZQ = 4;
 	public static final int DIAG_INF_DER = 0;
 	public static final int DIAG_INF_IZQ = 1;
+	private boolean dejarMorona = false;
 
 	public Agente(String id, Posicion pos){
 		this.setId(id);
@@ -103,6 +105,7 @@ public class Agente {
 					if(this.resultado.getOcupacion().startsWith("N")){
 						//System.out.print(this.getId() + ": deje " + this.getCargaActual() + " piedras\n");
 						this.dejarPiedras();
+						this.dejarMorona = false;
 						exito = true;
 					}
 				}
@@ -122,7 +125,27 @@ public class Agente {
 				}
 				break;
 			case 4:
-				System.out.println("Ejecutando Capa 4");
+				if(this.resultado.getOcupacion().startsWith("H")){
+					System.out.println("Ejecutando capa 4");
+					
+					Morona moronaEncontrada = (Morona) Tablero.obtenerElementoConId(this.getResultado().getOcupacion());
+					ArrayList<String> caminosMorona = moronaEncontrada.getCaminos();
+					
+					if (caminosMorona.size() > 0){
+						
+						String idCaminoASeguir = caminosMorona.get(0);
+						int indexCamino = Tablero.encuentraCamino(idCaminoASeguir);
+						ArrayList<String> caminoASeguir = Tablero.getListaCaminos().get(indexCamino);
+						exito = this.seguirCamino(caminoASeguir, moronaEncontrada.getId());
+						Monticulo monticuloACargar = (Monticulo)Tablero.obtenerElementoConId(caminoASeguir.get(0)); 
+						this.caminar(monticuloACargar.getPosicion());
+					}
+						
+					break;
+				}
+			
+			case 5:
+				System.out.println("Ejecutando Capa 5");
 				System.out.println("Posicion " + this.getId() + ": " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
 				exito = this.explorar();
 				break;
@@ -220,11 +243,22 @@ public class Agente {
 				break;
 			}
 		}
-		if(casillaAEvaluar == "-"){
-			Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
+			if (this.resultado.isExito()){
+				if (this.dejarMorona && Tablero.opcionMoronas){
+					//TODO
+					Morona morona = new Morona(posicion);
+					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = morona.getId();
+				}else{
+					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
+				}
+					
+			}else{
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			}
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
-			this.setResultado(nuevaPosicion, true, "-");
+			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 			TableroGrafico.actualizaPosicionAgente(this.getId());
 
 		}else{
@@ -308,15 +342,38 @@ public class Agente {
 			}
 		}
 		
-		if(casillaAEvaluar == "-"){
-			Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
+			if (this.resultado.isExito()){
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
+			}else{
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			}
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion);
-			this.setResultado(nuevaPosicion, true, "-");
+			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 			TableroGrafico.actualizaPosicionAgente(this.getId());
 	
 		}else{
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
+		}
+		return this.resultado;
+	}
+
+	public synchronized ResultadoCaminar caminar(Posicion posicion){
+		
+		String casillaAEvaluar = Tablero.matriz[posicion.getI()][posicion.getJ()];
+		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
+			if (this.resultado.isExito()){
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
+			}else{
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			}
+			Tablero.matriz[posicion.getI()][posicion.getJ()] = this.getId();
+			this.setPosicion(posicion);
+			this.setResultado(posicion, true, casillaAEvaluar);
+			TableroGrafico.actualizaPosicionAgente(this.getId());	
+		}else{
+			this.setResultado(posicion, false, casillaAEvaluar);
 		}
 		return this.resultado;
 	}
@@ -340,7 +397,7 @@ public class Agente {
 	
 		while(true){
 			if(movimiento > 7)
-				movimiento = 0;
+				movimiento = (int)(Math.random()*8);
 			switch (movimiento) {
 			case DIAG_INF_DER:
 				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
@@ -446,38 +503,59 @@ public class Agente {
 				//1,2,4
 				if(this.caminar(DIAG_INF_DER).isExito()){
 					return true;
-				}else if (this.caminar(DERECHA).isExito()) {
-					return true;
-				}else{
-					return this.caminar(ABAJO).isExito();
+				}
+				else{
+					if(this.getResultado().getOcupacion().startsWith("N")){
+						return true;
+					
+					}else if (this.caminar(DERECHA).isExito()) {
+						return true;
+					}else{
+						return this.caminar(ABAJO).isExito();
+					}
 				}
 				
 			}else{
 				//2,3,5
 				if(this.caminar(DIAG_INF_IZQ).isExito()){
 					return true;
-				}else if (this.caminar(IZQUIERDA).isExito()){
-					return true;
-				}else{
-					return this.caminar(ABAJO).isExito();
+				}
+				else{
+					if(this.getResultado().getOcupacion().startsWith("N")){
+						return true;
+					}else if (this.caminar(IZQUIERDA).isExito()){
+						return true;
+					}else{
+						return this.caminar(ABAJO).isExito();
+					}
 				}
 			}
 		}else {
 			if(jRelativa<0){
 				if(this.caminar(DIAG_SUP_DER).isExito()){
 					return true;
-				}else if(this.caminar(DERECHA).isExito()){
-					return true;
-				}else{
-					return this.caminar(ARRIBA).isExito();
+				}
+				else{
+					if(this.getResultado().getOcupacion().startsWith("N")){
+						return true;
+					}else if(this.caminar(DERECHA).isExito()){
+						return true;
+					}else{
+						return this.caminar(ARRIBA).isExito();
+					}
 				}
 			}else{
 				if(this.caminar(DIAG_SUP_IZQ).isExito()){
 					return true;
-				}else if(this.caminar(IZQUIERDA).isExito()){
-					return true;
-				}else{
-					return this.caminar(ARRIBA).isExito();
+				}
+				else{
+					if(this.getResultado().getOcupacion().startsWith("N")){
+						return true;
+					}else if(this.caminar(IZQUIERDA).isExito()){
+						return true;
+					}else{
+						return this.caminar(ARRIBA).isExito();
+					}
 				}
 			}
 		}
@@ -511,6 +589,8 @@ public class Agente {
 		if(monticulo.getPiedras() == 0){
 			TableroGrafico.quitaMonticulo(monticulo.getId());
 			Tablero.matriz[monticulo.getPosicion().getI()][monticulo.getPosicion().getJ()] = "-";
+		}else{
+			this.dejarMorona = true;
 		}
 		return true;
 	}
@@ -541,15 +621,23 @@ public class Agente {
 		return true;
 	}
 
-	/* Se implementara en la segunda fase **/
-	public synchronized boolean dejarMoronas(){
-		return false;
-	}
-
-	public synchronized boolean seguirMoronas(){
-		return false;
-	}
-
+	public synchronized boolean seguirCamino(ArrayList<String> caminoASeguir, String idMorona){
+		
+			int puntoInicial = caminoASeguir.indexOf(idMorona);
+			
+			try{
+				for (int i = puntoInicial -1; i > 0; i--) {
+					 Morona nextMorona = (Morona) Tablero.obtenerElementoConId(caminoASeguir.get(i));
+					 this.caminar(nextMorona.getPosicion());
+				}
+			
+				Tablero.obtenerElementoConId(caminoASeguir.get(0));
+				return true;
+			}catch (NoExisteElementoException e) {
+				return false;
+			}
+		}
+	
 	public synchronized boolean comerMoronas(){
 		return false;
 	}
