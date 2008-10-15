@@ -8,21 +8,6 @@ import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 
 public class Tablero {
 	
-	/*
-	 * Definicion de elementos
-	 * 
-	 * A -> Agente
-	 * M -> Monticulo
-	 * O -> Obstaculo
-	 * N -> Nave
-	 * - -> vacio
-	 * 
-	 * Tablero:
-	 * 600*600 pixeles
-	 * Cada cuadro 40 pixeles * 40 pixeles
-	 * Total cuadros = 15 * 15
-	 */
-	
 	public static String[][] matriz;	
 	public static int NUM_MONTICULOS;
 	public static int NUM_OBSTACULOS;
@@ -36,6 +21,10 @@ public class Tablero {
 	public static ArrayList<Obstaculo> listaObstaculos;
 	public static int[] capas;
 	public static Map<Integer, String> nombresCapas;
+	private static ArrayList<ArrayList<String>> listaCaminos;
+	private static ArrayList<Morona> listaMoronas;
+	public static boolean opcionMoronas = false;
+	
 	
 	public Tablero(int numMonticulos, int numObstaculos, int numAgentes){
 		
@@ -51,6 +40,8 @@ public class Tablero {
 		Tablero.listaAgentes = new ArrayList<Agente>();
 		Tablero.listaMonticulos = new ArrayList<Monticulo>();
 		Tablero.listaObstaculos = new ArrayList<Obstaculo>();
+		Tablero.listaMoronas = new ArrayList<Morona>();
+		Tablero.listaCaminos = new ArrayList<ArrayList<String>>();
 		Tablero.totalPiedras = 0;
 		
 		Tablero.matriz = creaMatriz();		
@@ -206,6 +197,37 @@ public class Tablero {
 		}
 	}
 	
+	public static ArrayList<ArrayList<String>> getListaCaminos() {
+		return listaCaminos;
+	}
+
+	public static void setListaCaminos(ArrayList<ArrayList<String>> caminos) {
+		Tablero.listaCaminos = caminos;
+	}
+
+	/*
+	 * Definicion de elementos
+	 * 
+	 * A -> Agente
+	 * M -> Monticulo
+	 * O -> Obstaculo
+	 * N -> Nave
+	 * - -> vacio
+	 * 
+	 * Tablero:
+	 * 600*600 pixeles
+	 * Cada cuadro 40 pixeles * 40 pixeles
+	 * Total cuadros = 15 * 15
+	 */
+	
+	public static ArrayList<Morona> getListaMoronas() {
+		return listaMoronas;
+	}
+
+	public static void setListaMoronas(ArrayList<Morona> listaMoronas) {
+		Tablero.listaMoronas = listaMoronas;
+	}
+
 	public String toString(){
 		String res = "";	
 		for(int i=0; i < Tablero.matriz.length; i++){
@@ -224,6 +246,18 @@ public class Tablero {
 			}
 			System.out.println();
 		}
+	}
+	
+	public static int encuentraCamino(String idCamino){
+		int i = 0;
+		for (ArrayList<String> camino: Tablero.getListaCaminos()) {
+			
+			if (camino.get(0).equals(idCamino)){
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 			
 }

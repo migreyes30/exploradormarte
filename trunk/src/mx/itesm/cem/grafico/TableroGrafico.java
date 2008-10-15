@@ -21,7 +21,6 @@ import mx.itesm.cem.explorador.Monticulo;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
-import mx.itesm.cem.explorador.ThreadAgente;
 
 
 

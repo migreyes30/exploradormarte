@@ -243,7 +243,6 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 						Tablero.capas = capasIntroducidas;
 						System.out.println(tb.toString());
 								
-						@SuppressWarnings("unused")
 						TableroGrafico tg = new TableroGrafico();
 						for(int i=0; i < Tablero.listaAgentes.size(); i++)
 							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas, tg);
