@@ -37,7 +37,7 @@ public class ThreadAgente implements Runnable{
 		if(!hasNotified){
 			hasNotified = true;
 			JOptionPane.showMessageDialog(this.tg,
-					"Mision Completada en " + (new Date().getTime() - start) +
+					"Mision Completada en " + ((new Date().getTime() - start) / 1000) +
 					" segundos.",
 					"Completado", JOptionPane.INFORMATION_MESSAGE);
 		}

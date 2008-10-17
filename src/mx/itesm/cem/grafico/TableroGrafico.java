@@ -18,9 +18,11 @@ import javax.swing.JPanel;
 
 import mx.itesm.cem.explorador.Agente;
 import mx.itesm.cem.explorador.Monticulo;
+import mx.itesm.cem.explorador.Morona;
 import mx.itesm.cem.explorador.Obstaculo;
 import mx.itesm.cem.explorador.Posicion;
 import mx.itesm.cem.explorador.Tablero;
+import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 
 
 
@@ -39,12 +41,14 @@ public class TableroGrafico extends JFrame implements ActionListener{
 	public static ArrayList<AgenteGrafico> listaAgentesGraficos;
 	public static ArrayList<MonticuloGrafico> listaMonticulosGraficos;
 	public static ArrayList<ObstaculoGrafico> listaObstaculosGraficos;
+	public static ArrayList<MoronaGrafica> listaMoronasGraficas;
 	
 	public TableroGrafico(){
 		
 		TableroGrafico.listaAgentesGraficos = new ArrayList<AgenteGrafico>();
 		TableroGrafico.listaMonticulosGraficos = new ArrayList<MonticuloGrafico>();
 		TableroGrafico.listaObstaculosGraficos = new ArrayList<ObstaculoGrafico>();
+		TableroGrafico.listaMoronasGraficas = new ArrayList<MoronaGrafica>();
 		
 		this.setTitle("Explorador Marte");
 		this.setSize(815,695);
@@ -63,7 +67,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		JLabel labelFondo = new JLabel(fondo);
 		labelFondo.setSize(fondo.getIconWidth(), fondo.getIconHeight());
 		
-		panelMenu.setLayout(new GridLayout(10,1));
+		panelMenu.setLayout(new GridLayout(11,1));
 		
 		panelMatriz.setOpaque(false);
 		panelMatriz.setSize(630, 630);
@@ -120,6 +124,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		panelMenu.add(new JLabel("2. " + Tablero.nombresCapas.get(Tablero.capas[1])));
 		panelMenu.add(new JLabel("3. " + Tablero.nombresCapas.get(Tablero.capas[2])));
 		panelMenu.add(new JLabel("4. " + Tablero.nombresCapas.get(Tablero.capas[3])));
+		panelMenu.add(new JLabel("5. " + Tablero.nombresCapas.get(Tablero.capas[4])));
 		panelMenu.add(new JLabel("Numero de agentes: " + Tablero.listaAgentes.size()));
 		panelMenu.add(new JLabel("Numero de monticulos: " + Tablero.listaMonticulos.size()));
 		panelMenu.add(new JLabel("Piedras totales: " + Tablero.totalPiedras));
@@ -206,19 +211,26 @@ public class TableroGrafico extends JFrame implements ActionListener{
 	}
 	
 	public synchronized static void actualizaPosicionAgente(String idAgente){
-		int indiceAgente = Tablero.obtenerIndiceDeObjeto(idAgente);
 		
-		Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(indiceAgente).getPosicion();
-		replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
-		
-		replace(panelPiedras, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
-		
-		Posicion posNueva = Tablero.listaAgentes.get(indiceAgente).getPosicion();
-		TableroGrafico.listaAgentesGraficos.get(indiceAgente).setPosicion(Tablero.listaAgentes.get(indiceAgente).getPosicion());						
-		replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(indiceAgente));
-
-		replace(panelPiedras, convierteAIndice(Tablero.listaAgentes.get(indiceAgente).getPosicion().getI(), Tablero.listaAgentes.get(indiceAgente).getPosicion().getJ()), new JLabel(Tablero.listaAgentes.get(indiceAgente).getCargaActual()+""));
-		
+		try{
+			int indiceAgente = Tablero.obtenerIndiceDeObjeto(idAgente);
+			
+			Agente a = Tablero.listaAgentes.get(indiceAgente);
+			
+			Posicion posAnterior = TableroGrafico.listaAgentesGraficos.get(indiceAgente).getPosicion();
+			if(!a.dejarMoronas)
+				replace(panelMatriz, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
+			
+			replace(panelPiedras, convierteAIndice(posAnterior.getI(), posAnterior.getJ()), new JLabel(""));
+			
+			Posicion posNueva = Tablero.listaAgentes.get(indiceAgente).getPosicion();
+			TableroGrafico.listaAgentesGraficos.get(indiceAgente).setPosicion(Tablero.listaAgentes.get(indiceAgente).getPosicion());						
+			replace(panelMatriz, convierteAIndice(posNueva.getI(), posNueva.getJ()), TableroGrafico.listaAgentesGraficos.get(indiceAgente));
+	
+			replace(panelPiedras, convierteAIndice(Tablero.listaAgentes.get(indiceAgente).getPosicion().getI(), Tablero.listaAgentes.get(indiceAgente).getPosicion().getJ()), new JLabel(Tablero.listaAgentes.get(indiceAgente).getCargaActual()+""));
+		}catch(NoExisteElementoException e){
+			e.printStackTrace();
+		}
 		/*Insertando nave*/
 		replace(panelMatriz, convierteAIndice(TableroGrafico.naveGrafica.getPosicion().getI(), TableroGrafico.naveGrafica.getPosicion().getJ()), TableroGrafico.naveGrafica);
 		
@@ -227,14 +239,35 @@ public class TableroGrafico extends JFrame implements ActionListener{
 	}
 	
 	public synchronized static void quitaMonticulo(String idMonticulo){
-		int indiceMonticulo = Tablero.obtenerIndiceDeObjeto(idMonticulo);
-		
-		Posicion pos = Tablero.listaMonticulos.get(indiceMonticulo).getPosicion();
-		replace(panelMatriz, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
-		replace(panelPiedras, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
-		
+		try{
+			int indiceMonticulo = Tablero.obtenerIndiceDeObjeto(idMonticulo);
+			
+			Posicion pos = Tablero.listaMonticulos.get(indiceMonticulo).getPosicion();
+			replace(panelMatriz, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
+			replace(panelPiedras, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
+		}catch(NoExisteElementoException e){
+			e.printStackTrace();
+		}
 		panelPiedras.repaint();
 		panelMatriz.repaint();
+	}
+	
+	public synchronized static void agregaMoronaGrafica(String idMorona){
+		Morona temp = (Morona) Tablero.obtenerElementoConId(idMorona);
+		MoronaGrafica nuevaMoronaGrafica = new MoronaGrafica(temp.getId(), temp.getPosicion());
+		TableroGrafico.listaMoronasGraficas.add(nuevaMoronaGrafica);
+		replace(panelMatriz, convierteAIndice(nuevaMoronaGrafica.getPosicion().getI(), 
+				nuevaMoronaGrafica.getPosicion().getJ()), nuevaMoronaGrafica);
+	}
+	
+	public synchronized static void quitaMoronaGrafica(String idMorona){
+		try{
+			int indiceMorona = Tablero.obtenerIndiceDeObjeto(idMorona);
+			Posicion pos = Tablero.listaMoronas.get(indiceMorona).getPosicion();
+			replace(panelMatriz, convierteAIndice(pos.getI(), pos.getJ()), new JLabel(""));
+		}catch(NoExisteElementoException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -263,20 +296,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 				"\n*Maricela Obeso Pulido" + 
 				"\n*Miguel Angel Ramírez Reyes\n" + 
 				"\n ITESM CEM." +
-				"\n"+
-				"\n This work is licensed under the Creative Commons"+ 
-				 "\n Attribution-NonCommercial 2.5 License. To view a" + 
-				 "\n copy of this license, visit: " +
-				 "\n"+
-				 "\n http://creativecommons.org/licenses/by-nc/2.5/" +
-				 "\n"+
-				 "\n Or send a letter to:" +
-				 "\n" +
-				 "\n     Creative Commons"+
-				 "\n     543 Howard Street, 5th Floor"+
-				 "\n     San Francisco, CA 94105"+
-				 "\n     USA"
-				 ;
+				"\n";
 			JOptionPane.showMessageDialog(this, message);
 			
 		}
