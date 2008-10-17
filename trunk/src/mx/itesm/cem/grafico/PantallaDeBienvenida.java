@@ -15,11 +15,11 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 1L;
 	private static final int ANCHO = 371;
-	private static final int ALTO = 594;
+	private static final int ALTO = 700;
 	private static final int LIMITE_CARACTERES = 6;
 	private static final int ANCHO_TEXTFIELD = 50;
 	private static final int ALTO_TEXTFIELD = 20;
-	private static final int NUM_CAPAS = 4;
+	private static final int NUM_CAPAS = 5;
 	private Box tituloBox, opcionesBox, entradasBox, capasLeftBox, capasRightBox, botonesBox ;
 	public JPanel botonesPanel;
 	public JButton aceptarButton, borrarButton;
@@ -29,6 +29,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 	private JComboBox ordenEvitarObstaculos;
 	private JComboBox ordenLlevarPiedras;
 	private JComboBox ordenRecolectarMuestras;
+	private JComboBox ordenMoronas;
 	private JComboBox ordenExplorar;
 	
 	
@@ -103,7 +104,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.botonesPanel.add(botonesBox, BorderLayout.CENTER);
 		
 				
-		String[] ordenCapaArray =  {"1","2","3","4"};
+		String[] ordenCapaArray =  {"1","2","3","4","5"};
 		
 		ordenEvitarObstaculos = new JComboBox(ordenCapaArray);
 		ordenEvitarObstaculos.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
@@ -117,15 +118,20 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		ordenRecolectarMuestras.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
 		ordenRecolectarMuestras.setSelectedIndex(2);
 		
+		ordenMoronas = new JComboBox(ordenCapaArray);
+		ordenMoronas.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
+		ordenMoronas.setSelectedIndex(3);
+		
 		ordenExplorar = new JComboBox(ordenCapaArray);
 		ordenExplorar.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
-		ordenExplorar.setSelectedIndex(3);
+		ordenExplorar.setSelectedIndex(4);
 		
 		
 		JLabel evitarObstaculosLbl = new JLabel("1. Evitar obstáculos: ");
 		JLabel llevarPiedrasLbl = new JLabel("2. Llevar piedras: ");
 		JLabel recolectarMuestrasLbl = new JLabel("3. Recolectar piedras: ");
-		JLabel explorarLbl = new JLabel("4. Explorar: ");
+		JLabel moronasLbl = new JLabel("4. Seguir moronas: ");
+		JLabel explorarLbl = new JLabel("5. Explorar: ");
 		
 		
 		this.capasLeftBox.add(evitarObstaculosLbl);
@@ -133,6 +139,8 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.capasLeftBox.add(llevarPiedrasLbl);
 		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
 		this.capasLeftBox.add(recolectarMuestrasLbl);
+		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
+		this.capasLeftBox.add(moronasLbl);
 		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
 		this.capasLeftBox.add(explorarLbl);
 		
@@ -143,6 +151,8 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.capasRightBox.add(ordenLlevarPiedras);
 		this.capasRightBox.add(Box.createVerticalStrut(40));
 		this.capasRightBox.add(ordenRecolectarMuestras);
+		this.capasRightBox.add(Box.createVerticalStrut(40));
+		this.capasRightBox.add(ordenMoronas);
 		this.capasRightBox.add(Box.createVerticalStrut(40));
 		this.capasRightBox.add(ordenExplorar);
 		
@@ -193,6 +203,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		int capaDos = 0;
 		int capaTres = 0;
 		int capaCuatro = 0;
+		int capaCinco = 0;
 		
 		for(int capa : capas){
 			switch (capa) {
@@ -204,10 +215,12 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 						break;
 				case 4: capaCuatro++;
 						break;
+				case 5: capaCinco++;
+						break;
 			}
 		}		
 		 //Solo debe haber un orden asignada a cada capa, dos capas no pueden tener el mismo orden de importancias
-		return capaUno == 1 && capaDos == 1 && capaTres == 1 && capaCuatro == 1;
+		return capaUno == 1 && capaDos == 1 && capaTres == 1 && capaCuatro == 1 && capaCinco == 1;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -221,7 +234,8 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 				capasIntroducidas[Integer.parseInt(ordenEvitarObstaculos.getSelectedItem().toString())- 1] = 1;  	// 1 = Evitar Obstaculo
 				capasIntroducidas[Integer.parseInt(ordenLlevarPiedras.getSelectedItem().toString())- 1] = 2; 		// 2 = Regresar a nave
 				capasIntroducidas[Integer.parseInt(ordenRecolectarMuestras.getSelectedItem().toString()) - 1] = 3; 	// 3 = Cargar
-				capasIntroducidas[Integer.parseInt(ordenExplorar.getSelectedItem().toString()) - 1] = 4;			// 4 = Explorar
+				capasIntroducidas[Integer.parseInt(ordenMoronas.getSelectedItem().toString()) - 1] = 4;				// 4 = Moronas
+				capasIntroducidas[Integer.parseInt(ordenExplorar.getSelectedItem().toString()) - 1] = 5;			// 5 = Explorar
 				
 				if(this.validarCapas(capasIntroducidas)){
 					
@@ -242,7 +256,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes);
 						Tablero.capas = capasIntroducidas;
 						System.out.println(tb.toString());
-								
+						
 						TableroGrafico tg = new TableroGrafico();
 						for(int i=0; i < Tablero.listaAgentes.size(); i++)
 							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas, tg);

@@ -11,7 +11,7 @@ public class Monticulo {
 		this.setId(id);
 		this.setPosicion(pos);
 		while(this.getPiedras() == 0)
-			this.setPiedras((int)(Math.random()*21));
+			this.setPiedras((int)(Math.random()*31));
 	}
 
 	public Posicion getPosicion() {

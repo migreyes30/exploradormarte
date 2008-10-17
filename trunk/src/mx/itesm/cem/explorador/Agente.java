@@ -1,7 +1,10 @@
 package mx.itesm.cem.explorador;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.swing.JLabel;
+
 import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 import mx.itesm.cem.grafico.TableroGrafico;
 
@@ -20,18 +23,20 @@ public class Agente {
 	public static final int DIAG_SUP_IZQ = 4;
 	public static final int DIAG_INF_DER = 0;
 	public static final int DIAG_INF_IZQ = 1;
-	private boolean dejarMorona = false;
+	
+	public boolean dejarMoronas;
 
 	public Agente(String id, Posicion pos){
 		this.setId(id);
 		this.setPosicion(pos);
 		while(this.getCapacidad() == 0)
-			this.setCapacidad((int)(Math.random()* ((Tablero.totalPiedras/4)+1)));
+			this.setCapacidad((int)(Math.random()* 21));
 		this.setCargaActual(0);
 		
 		this.resultado.setExito(false);
 		this.resultado.setOcupacion(Tablero.nave.getId());
 		this.resultado.setPosicion(this.getPosicion());
+		this.dejarMoronas = false;
 	}
 
 	public Posicion getPosicion() {
@@ -105,7 +110,6 @@ public class Agente {
 					if(this.resultado.getOcupacion().startsWith("N")){
 						//System.out.print(this.getId() + ": deje " + this.getCargaActual() + " piedras\n");
 						this.dejarPiedras();
-						this.dejarMorona = false;
 						exito = true;
 					}
 				}
@@ -126,24 +130,12 @@ public class Agente {
 				break;
 			case 4:
 				if(this.resultado.getOcupacion().startsWith("H")){
-					System.out.println("Ejecutando capa 4");
+					System.out.println("Ejecutando Capa 4");
+					exito = this.seguirMoronas(this.getResultado().getOcupacion());
 					
-					Morona moronaEncontrada = (Morona) Tablero.obtenerElementoConId(this.getResultado().getOcupacion());
-					ArrayList<String> caminosMorona = moronaEncontrada.getCaminos();
-					
-					if (caminosMorona.size() > 0){
-						
-						String idCaminoASeguir = caminosMorona.get(0);
-						int indexCamino = Tablero.encuentraCamino(idCaminoASeguir);
-						ArrayList<String> caminoASeguir = Tablero.getListaCaminos().get(indexCamino);
-						exito = this.seguirCamino(caminoASeguir, moronaEncontrada.getId());
-						Monticulo monticuloACargar = (Monticulo)Tablero.obtenerElementoConId(caminoASeguir.get(0)); 
-						this.caminar(monticuloACargar.getPosicion());
-					}
-						
-					break;
 				}
-			
+				break;
+					
 			case 5:
 				System.out.println("Ejecutando Capa 5");
 				System.out.println("Posicion " + this.getId() + ": " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
@@ -243,25 +235,35 @@ public class Agente {
 				break;
 			}
 		}
-		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
-			if (this.resultado.isExito()){
-				if (this.dejarMorona && Tablero.opcionMoronas){
-					//TODO
-					Morona morona = new Morona(posicion);
-					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = morona.getId();
-				}else{
-					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
+		if(casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H")){
+			if(casillaAEvaluar.startsWith("H")){
+				TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+				try{
+					Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+				}catch(NoExisteElementoException e){
+					e.printStackTrace();
 				}
-					
-			}else{
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
 			}
+			if(this.dejarMoronas){
+				Tablero.maxIdMorona++;
+				String newMoronaId = "H"+(Tablero.maxIdMorona);
+				Tablero.listaMoronas.add(new Morona(newMoronaId, this.getPosicion()));
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = newMoronaId;
+				TableroGrafico.agregaMoronaGrafica(newMoronaId);
+			}
+			else
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 			TableroGrafico.actualizaPosicionAgente(this.getId());
 
 		}else{
+			if(casillaAEvaluar.startsWith("M")){
+				System.out.println("------------MONTICULO------- CAMINAR RANDOM-----");
+				System.out.println("************");
+			}
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 		}
 		return this.resultado;
@@ -342,41 +344,66 @@ public class Agente {
 			}
 		}
 		
-		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
-			if (this.resultado.isExito()){
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
-			}else{
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+		if(casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H")){
+			if(casillaAEvaluar.startsWith("H")){
+				TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+				try{
+					Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+				}catch(NoExisteElementoException e){
+					e.printStackTrace();
+				}
 			}
+			if(this.dejarMoronas){
+				Tablero.maxIdMorona++;
+				String newMoronaId = "H"+(Tablero.maxIdMorona);
+				Tablero.listaMoronas.add(new Morona(newMoronaId, this.getPosicion()));
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = newMoronaId;
+				TableroGrafico.agregaMoronaGrafica(newMoronaId);
+			}
+			else
+				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+			
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion);
 			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 			TableroGrafico.actualizaPosicionAgente(this.getId());
 	
 		}else{
+			if(casillaAEvaluar.startsWith("M")){
+				System.out.println("------------MONTICULO-------CAMINAR(INT)-----");
+				System.out.println("************");
+			}
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 		}
 		return this.resultado;
 	}
-
-	public synchronized ResultadoCaminar caminar(Posicion posicion){
-		
-		String casillaAEvaluar = Tablero.matriz[posicion.getI()][posicion.getJ()];
-		if(casillaAEvaluar.startsWith("H") || casillaAEvaluar == "-"){
-			if (this.resultado.isExito()){
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = this.resultado.getOcupacion();	
-			}else{
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
-			}
-			Tablero.matriz[posicion.getI()][posicion.getJ()] = this.getId();
-			this.setPosicion(posicion);
-			this.setResultado(posicion, true, casillaAEvaluar);
-			TableroGrafico.actualizaPosicionAgente(this.getId());	
-		}else{
-			this.setResultado(posicion, false, casillaAEvaluar);
+	
+	/**
+	 * Metodo caminar que recibe una posicion como parámetro.
+	 * Este metodo solo es usado para seguir moronas.
+	 */
+	public synchronized void caminar(Posicion posicionASeguir) {
+	
+	String casillaAEvaluar = 
+		Tablero.matriz[posicionASeguir.getI()][posicionASeguir.getJ()];
+	
+	if(casillaAEvaluar.startsWith("H")){
+		TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+		try{
+			Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+		}catch(NoExisteElementoException e){
+			e.printStackTrace();
 		}
-		return this.resultado;
+		Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
+		Tablero.matriz[posicionASeguir.getI()][posicionASeguir.getJ()] = this.getId();
+		this.setPosicion(posicionASeguir);
+		this.setResultado(posicionASeguir, true, casillaAEvaluar);
+		TableroGrafico.actualizaPosicionAgente(this.getId());
+
+	}else{
+		this.setResultado(posicionASeguir, false, casillaAEvaluar);
 	}
+}
 
 	/**
 	 * Metodo que permite evadir obstaculos
@@ -397,7 +424,7 @@ public class Agente {
 	
 		while(true){
 			if(movimiento > 7)
-				movimiento = (int)(Math.random()*8);
+				movimiento = 0;
 			switch (movimiento) {
 			case DIAG_INF_DER:
 				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
@@ -454,18 +481,42 @@ public class Agente {
 				this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 				return false;
 			}
-	
-			if(casillaAEvaluar == "-"){
-				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
-				Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
-				this.setPosicion(nuevaPosicion);
-				this.setResultado(nuevaPosicion, true, "-");
-				TableroGrafico.actualizaPosicionAgente(this.getId());
-				return true;
+			
+			if(casillaAEvaluar != null 
+					&& (casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H"))){
+				if(casillaAEvaluar.startsWith("H")){
+					TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+					try{
+						Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+					}catch(NoExisteElementoException e){
+						e.printStackTrace();
+					}
+				}
+				if(this.dejarMoronas){
+					Tablero.maxIdMorona++;
+					String newMoronaId = "H"+(Tablero.maxIdMorona);
+					Tablero.listaMoronas.add(new Morona(newMoronaId, this.getPosicion()));
+					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = newMoronaId;
+					TableroGrafico.agregaMoronaGrafica(newMoronaId);
+				}
+				else
+					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
 				
+				Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
+				this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
+				this.setResultado(nuevaPosicion, true, casillaAEvaluar);
+				TableroGrafico.actualizaPosicionAgente(this.getId());
+				
+				return true;
+
 			}else{
+				if(casillaAEvaluar != null && casillaAEvaluar.startsWith("M")){
+					System.out.println("-----------MONTICULO-------EVITAR OBSTACULO-----");
+					System.out.println("************");
+				}
 				movimiento++;
 			}
+			
 		}
 	
 	}
@@ -503,59 +554,38 @@ public class Agente {
 				//1,2,4
 				if(this.caminar(DIAG_INF_DER).isExito()){
 					return true;
-				}
-				else{
-					if(this.getResultado().getOcupacion().startsWith("N")){
-						return true;
-					
-					}else if (this.caminar(DERECHA).isExito()) {
-						return true;
-					}else{
-						return this.caminar(ABAJO).isExito();
-					}
+				}else if (this.caminar(DERECHA).isExito()) {
+					return true;
+				}else{
+					return this.caminar(ABAJO).isExito();
 				}
 				
 			}else{
 				//2,3,5
 				if(this.caminar(DIAG_INF_IZQ).isExito()){
 					return true;
-				}
-				else{
-					if(this.getResultado().getOcupacion().startsWith("N")){
-						return true;
-					}else if (this.caminar(IZQUIERDA).isExito()){
-						return true;
-					}else{
-						return this.caminar(ABAJO).isExito();
-					}
+				}else if (this.caminar(IZQUIERDA).isExito()){
+					return true;
+				}else{
+					return this.caminar(ABAJO).isExito();
 				}
 			}
 		}else {
 			if(jRelativa<0){
 				if(this.caminar(DIAG_SUP_DER).isExito()){
 					return true;
-				}
-				else{
-					if(this.getResultado().getOcupacion().startsWith("N")){
-						return true;
-					}else if(this.caminar(DERECHA).isExito()){
-						return true;
-					}else{
-						return this.caminar(ARRIBA).isExito();
-					}
+				}else if(this.caminar(DERECHA).isExito()){
+					return true;
+				}else{
+					return this.caminar(ARRIBA).isExito();
 				}
 			}else{
 				if(this.caminar(DIAG_SUP_IZQ).isExito()){
 					return true;
-				}
-				else{
-					if(this.getResultado().getOcupacion().startsWith("N")){
-						return true;
-					}else if(this.caminar(IZQUIERDA).isExito()){
-						return true;
-					}else{
-						return this.caminar(ARRIBA).isExito();
-					}
+				}else if(this.caminar(IZQUIERDA).isExito()){
+					return true;
+				}else{
+					return this.caminar(ARRIBA).isExito();
 				}
 			}
 		}
@@ -589,8 +619,9 @@ public class Agente {
 		if(monticulo.getPiedras() == 0){
 			TableroGrafico.quitaMonticulo(monticulo.getId());
 			Tablero.matriz[monticulo.getPosicion().getI()][monticulo.getPosicion().getJ()] = "-";
-		}else{
-			this.dejarMorona = true;
+		}
+		else{
+			this.dejarMoronas = true;
 		}
 		return true;
 	}
@@ -603,43 +634,136 @@ public class Agente {
 					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
-			TableroGrafico.replace(TableroGrafico.panelMenu, 9, 
+			TableroGrafico.replace(TableroGrafico.panelMenu, 10, 
 					new JLabel("Piedras por dejar en nave: " + 
 							(Tablero.totalPiedras - Tablero.nave.getPiedras())));
 			try {
-				Thread.sleep(100); // Para que tarde al cargar
+				Thread.sleep(100); // Para que tarde al dejar piedras
 			} catch (InterruptedException e) {
 				
 			}
 		}
 		
 		try {
-			Thread.sleep(100);  //Para que tarde al dejar piedras.
+			Thread.sleep(100);  //Para que tarde al dejar la ultima piedra.
 		} catch (InterruptedException e) {
 			
 		}
+		this.dejarMoronas = false;
 		return true;
 	}
 
-	public synchronized boolean seguirCamino(ArrayList<String> caminoASeguir, String idMorona){
+	public synchronized String buscarMoronaCercana(String idMorona){
 		
-			int puntoInicial = caminoASeguir.indexOf(idMorona);
-			
-			try{
-				for (int i = puntoInicial -1; i > 0; i--) {
-					 Morona nextMorona = (Morona) Tablero.obtenerElementoConId(caminoASeguir.get(i));
-					 this.caminar(nextMorona.getPosicion());
+		int i = this.posicion.getI();
+		int j = this.posicion.getJ();
+		
+		ArrayList<Integer> indicesMoronasCercanas = new ArrayList<Integer>();
+		
+		for(int movimiento = 0; movimiento <= 7; movimiento++){
+			switch (movimiento) {
+			case DIAG_INF_DER:
+				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1
+						&& (Tablero.matriz[i+1][j+1].startsWith("H")||Tablero.matriz[i+1][j+1].startsWith("M"))){
+					if(Tablero.matriz[i+1][j+1].startsWith("M"))
+						return Tablero.matriz[i+1][j+1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i+1][j+1].substring(1)));
 				}
-			
-				Tablero.obtenerElementoConId(caminoASeguir.get(0));
-				return true;
-			}catch (NoExisteElementoException e) {
-				return false;
+				break;
+			case DIAG_INF_IZQ:
+				if(i<Tablero.CASILLAS-1 && j>0
+						&& (Tablero.matriz[i+1][j-1].startsWith("H")||Tablero.matriz[i+1][j-1].startsWith("M"))){
+					if(Tablero.matriz[i+1][j-1].startsWith("M"))
+						return Tablero.matriz[i+1][j-1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i+1][j-1].substring(1)));
+				}
+				break;
+			case ABAJO:
+				if(i<Tablero.CASILLAS-1 && (Tablero.matriz[i+1][j].startsWith("H")|| Tablero.matriz[i+1][j].startsWith("M"))){
+					if(Tablero.matriz[i+1][j].startsWith("M"))
+						return Tablero.matriz[i+1][j];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i+1][j].substring(1)));
+				}
+				break;
+			case DIAG_SUP_DER:
+				if(i>0 && j<Tablero.CASILLAS-1 
+						&& (Tablero.matriz[i-1][j+1].startsWith("H")|| Tablero.matriz[i-1][j+1].startsWith("M"))){
+					if(Tablero.matriz[i-1][j+1].startsWith("M"))
+						return Tablero.matriz[i-1][j+1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i-1][j+1].substring(1)));
+				}
+				break;
+			case DIAG_SUP_IZQ:
+				if(i>0 && j>0 && (Tablero.matriz[i-1][j-1].startsWith("H") || Tablero.matriz[i-1][j-1].startsWith("M"))){
+					if(Tablero.matriz[i-1][j-1].startsWith("M"))
+						return Tablero.matriz[i-1][j-1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i-1][j-1].substring(1)));
+				}
+				break;
+			case ARRIBA:
+				if(i>0 && (Tablero.matriz[i-1][j].startsWith("H") || Tablero.matriz[i-1][j].startsWith("M"))){
+					if(Tablero.matriz[i-1][j].startsWith("M"))
+						return Tablero.matriz[i-1][j];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i-1][j].substring(1)));
+				}
+				break;
+			case DERECHA:
+				if(j < Tablero.CASILLAS -1 
+						&& (Tablero.matriz[i][j+1].startsWith("H") || Tablero.matriz[i][j+1].startsWith("M"))){
+					if(Tablero.matriz[i][j+1].startsWith("M"))
+						return Tablero.matriz[i][j+1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i][j+1].substring(1)));
+				}
+				break;
+	
+			case IZQUIERDA:
+				if(j>0 && (Tablero.matriz[i][j-1].startsWith("H") || Tablero.matriz[i][j-1].startsWith("M"))){
+					if(Tablero.matriz[i][j-1].startsWith("M"))
+						return Tablero.matriz[i][j-1];
+					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i][j-1].substring(1)));
+				}
+				break;
+			default:			
+				break;
 			}
 		}
+		
+		if(indicesMoronasCercanas.size() > 0){
+			Collections.sort(indicesMoronasCercanas);
+			if(indicesMoronasCercanas.indexOf(Integer.parseInt(idMorona.substring(1)) - 1) != -1)
+				return "H" + indicesMoronasCercanas.get(indicesMoronasCercanas.indexOf(Integer.parseInt(idMorona.substring(1))-1));
+			else
+				return "H" + indicesMoronasCercanas.get(0);
+		}
+		else{
+			return "";
+		}
+	}
 	
-	public synchronized boolean comerMoronas(){
-		return false;
+	public synchronized boolean seguirMoronas(String idMorona){
+		
+		boolean exito = false;
+		
+		while(this.buscarMoronaCercana(idMorona) != ""){
+			if(this.buscarMoronaCercana(idMorona).startsWith("M")){
+				Monticulo monticuloEncontrado = (Monticulo)Tablero.obtenerElementoConId(
+													this.buscarMoronaCercana(idMorona));
+				this.caminar(monticuloEncontrado.getPosicion());
+				exito = true;
+				break;
+			}
+			Morona moronaASeguir = (Morona)Tablero.obtenerElementoConId(this.buscarMoronaCercana(idMorona));
+			this.caminar(moronaASeguir.getPosicion());
+			idMorona = this.getResultado().getOcupacion();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return exito;
 	}
 
 }
