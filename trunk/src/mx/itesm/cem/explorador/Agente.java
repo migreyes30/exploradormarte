@@ -414,15 +414,18 @@ public class Agente {
 	 * @return
 	 */
 	public synchronized boolean evitarObstaculo(){
-		int i = this.posicion.getI();
-		int j = this.posicion.getJ();
+		
 		int movimiento = (int)(Math.random()*8);
+		int cantCorrecionMov = 2;
 	
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
 	
 	
-		while(true){
+		while(cantCorrecionMov > 0){
+			int i = this.posicion.getI();
+			int j = this.posicion.getJ();
+			
 			if(movimiento > 7)
 				movimiento = 0;
 			switch (movimiento) {
@@ -507,17 +510,25 @@ public class Agente {
 				this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 				TableroGrafico.actualizaPosicionAgente(this.getId());
 				
-				return true;
+				cantCorrecionMov--;
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			}else{
 				if(casillaAEvaluar != null && casillaAEvaluar.startsWith("M")){
 					System.out.println("-----------MONTICULO-------EVITAR OBSTACULO-----");
 					System.out.println("************");
 				}
-				movimiento++;
+				//movimiento++;
 			}
+			movimiento++;
 			
 		}
+		return true;
 	
 	}
 
