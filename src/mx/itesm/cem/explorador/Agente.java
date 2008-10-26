@@ -9,7 +9,7 @@ import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Agente {
-	
+
 	private Posicion posicion;
 	private int capacidad = 0;
 	private int cargaActual;
@@ -23,7 +23,7 @@ public class Agente {
 	public static final int DIAG_SUP_IZQ = 4;
 	public static final int DIAG_INF_DER = 0;
 	public static final int DIAG_INF_IZQ = 1;
-	
+
 	public boolean dejarMoronas;
 
 	public Agente(String id, Posicion pos){
@@ -32,7 +32,7 @@ public class Agente {
 		while(this.getCapacidad() == 0)
 			this.setCapacidad((int)(Math.random()* 21));
 		this.setCargaActual(0);
-		
+
 		this.resultado.setExito(false);
 		this.resultado.setOcupacion(Tablero.nave.getId());
 		this.resultado.setPosicion(this.getPosicion());
@@ -85,9 +85,9 @@ public class Agente {
  * Metodo principal que controla el comportamiento del agente
  * recibe un arreglo con las capas, el indice de cada elemento
  * del arreglo representa el orden de la capa.
- *  
+ *
  * @param capas Arreglo que contiene las capas en orden de importancia
- * 
+ *
  */
 	public synchronized void actuar(int[] capas){
 		int i =0;
@@ -96,7 +96,7 @@ public class Agente {
 			if(i >= capas.length)
 				i = 0;
 			switch (capas[i]) {
-			case 1:				
+			case 1:
 				if (this.resultado.getOcupacion().startsWith("O")
 						|| this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
@@ -115,27 +115,33 @@ public class Agente {
 				}
 				break;
 			case 3:
-				if (this.resultado.getOcupacion().startsWith("M")) { //Si intentaste moverte a una casilla que tiene un monticulo
+				if (this.resultado.getOcupacion().startsWith("M")&& this.getCargaActual() == 0) { //Si intentaste moverte a una casilla que tiene un monticulo
 					System.out.println("Ejecutando Capa 3");
 					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
 					System.out.print(this.getId() + ": ");
 					exito = this.cargar(monticulo);
-					//if(exito && monticulo.getPiedras() != 0)
-						
-						/*System.out.print("NOOOOOOOOOOOOOOO ");
-					System.out.print("PUDE CARGAR " + monticulo.getPiedras() + " PIEDRAS!!! Aun me caben: " + (this.getCapacidad() -
-							this.getCargaActual()) + "\n");
-					*/
 				}
 				break;
 			case 4:
-				if(this.resultado.getOcupacion().startsWith("H")){
-					System.out.println("Ejecutando Capa 4");
-					exito = this.seguirMoronas(this.getResultado().getOcupacion());
-					
+				if(Tablero.isComunicacionMoronas()){
+					if(this.resultado.getOcupacion().startsWith("H")){
+						System.out.println("Ejecutando Capa 4 Morona");
+						exito = this.seguirMoronas(this.getResultado().getOcupacion());
+					}
+				}else if(Tablero.isComunicacionKQML()){
+					if(Tablero.buzon.size()>0 & this.getCargaActual() == 0){
+						System.out.println("Ejecutando Capa 4 KQML");
+						exito = this.leerBuzon();
+						if(!exito & this.buscarMoronaCercana(this.resultado.getOcupacion()).startsWith("M")){
+								Monticulo monticuloEncontrado = 
+									(Monticulo)Tablero.obtenerElementoConId(this.buscarMoronaCercana(this.resultado.getOcupacion()));
+								this.caminar(monticuloEncontrado.getPosicion());
+								exito = true;
+						}
+					}
 				}
 				break;
-					
+
 			case 5:
 				System.out.println("Ejecutando Capa 5");
 				System.out.println("Posicion " + this.getId() + ": " + this.getPosicion().getI() + ", " + this.getPosicion().getJ());
@@ -144,9 +150,9 @@ public class Agente {
 			default:
 				//System.out.println("Default");
 				break;
-			} 
-			i++; //De lo contrario, intentar con la siguiente capa	
-			
+			}
+			i++; //De lo contrario, intentar con la siguiente capa
+
 		}
 	}
 
@@ -158,7 +164,7 @@ public class Agente {
  */
 	public synchronized boolean explorar(){
 		this.caminar();
-		
+
 		return this.resultado.isExito();
 	}
 
@@ -173,10 +179,10 @@ public class Agente {
 	public synchronized ResultadoCaminar caminar(){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
-		
+
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
-		
+
 		while(casillaAEvaluar == null){
 			int movimiento = (int)(Math.random()*8);
 			switch (movimiento) {
@@ -218,19 +224,19 @@ public class Agente {
 				break;
 			case DERECHA:
 				if(j < Tablero.CASILLAS -1 ){
-	
+
 					nuevaPosicion = new Posicion(i,j+1);
 					casillaAEvaluar = Tablero.matriz[i][j+1];
 				}
 				break;
-	
+
 			case IZQUIERDA:
 				if(j>0){
 					nuevaPosicion = new Posicion(i,j-1);
 					casillaAEvaluar = Tablero.matriz[i][j-1];
 				}
 				break;
-			default:			
+			default:
 				casillaAEvaluar = null;
 				break;
 			}
@@ -253,7 +259,7 @@ public class Agente {
 			}
 			else
 				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
-			
+
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
@@ -262,7 +268,6 @@ public class Agente {
 		}else{
 			if(casillaAEvaluar.startsWith("M")){
 				System.out.println("------------MONTICULO------- CAMINAR RANDOM-----");
-				System.out.println("************");
 			}
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 		}
@@ -271,27 +276,27 @@ public class Agente {
 
 /**
  * Metodo sobrecargado que permite que la accion
- * caminar ya no sea aleatoria, de esta manera 
+ * caminar ya no sea aleatoria, de esta manera
  * es posible que el agente se mueva en una direccion
- * determinada, se usa en regresarANave() 
- * 
+ * determinada, se usa en regresarANave()
+ *
  * @param movimiento
  * @return
  */
-		
+
 	public synchronized ResultadoCaminar caminar(int movimiento){
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
-	
+
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
-	
+
 		while(casillaAEvaluar == null){
 			switch (movimiento) {
 			case DIAG_INF_DER:
 				if (i<Tablero.CASILLAS-1 && j<Tablero.CASILLAS-1){
 					nuevaPosicion =new Posicion(i+1,j+1);
-					casillaAEvaluar = Tablero.matriz[i+1][j+1];				
+					casillaAEvaluar = Tablero.matriz[i+1][j+1];
 				}
 				break;
 			case DIAG_INF_IZQ:
@@ -326,12 +331,12 @@ public class Agente {
 				break;
 			case DERECHA:
 				if(j < Tablero.CASILLAS-1 ){
-		
+
 					nuevaPosicion = new Posicion(i,j+1);
 					casillaAEvaluar = Tablero.matriz[i][j+1];
 				}
 				break;
-		
+
 			case IZQUIERDA:
 				if(j>0){
 					nuevaPosicion = new Posicion(i,j-1);
@@ -340,10 +345,10 @@ public class Agente {
 				break;
 			default:
 				/*Nunca deberia llegar aqui, pues significaria que la validacion para no salirse del tablero fallo*/
-				casillaAEvaluar = null; 
+				casillaAEvaluar = null;
 			}
 		}
-		
+
 		if(casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H")){
 			if(casillaAEvaluar.startsWith("H")){
 				TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
@@ -362,31 +367,30 @@ public class Agente {
 			}
 			else
 				Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
-			
+
 			Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 			this.setPosicion(nuevaPosicion);
 			this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 			TableroGrafico.actualizaPosicionAgente(this.getId());
-	
+
 		}else{
 			if(casillaAEvaluar.startsWith("M")){
 				System.out.println("------------MONTICULO-------CAMINAR(INT)-----");
-				System.out.println("************");
 			}
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 		}
 		return this.resultado;
 	}
-	
+
 	/**
 	 * Metodo caminar que recibe una posicion como parámetro.
 	 * Este metodo solo es usado para seguir moronas.
 	 */
 	public synchronized void caminar(Posicion posicionASeguir) {
-	
-	String casillaAEvaluar = 
+
+	String casillaAEvaluar =
 		Tablero.matriz[posicionASeguir.getI()][posicionASeguir.getJ()];
-	
+
 	if(casillaAEvaluar.startsWith("H")){
 		TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
 		try{
@@ -410,22 +414,22 @@ public class Agente {
 	 * a partir de intentar moverse en todas direcciones
 	 * a su alrededor hasta que encuentra una casilla
 	 * vacia a donde podra moverse
-	 * 
+	 *
 	 * @return
 	 */
 	public synchronized boolean evitarObstaculo(){
-		
+
 		int movimiento = (int)(Math.random()*8);
 		int cantCorrecionMov = 2;
-	
+
 		String casillaAEvaluar = null;
 		Posicion nuevaPosicion = null;
-	
-	
+
+
 		while(cantCorrecionMov > 0){
 			int i = this.posicion.getI();
 			int j = this.posicion.getJ();
-			
+
 			if(movimiento > 7)
 				movimiento = 0;
 			switch (movimiento) {
@@ -467,25 +471,25 @@ public class Agente {
 				break;
 			case DERECHA:
 				if(j < Tablero.CASILLAS-1 ){
-	
+
 					nuevaPosicion = new Posicion(i,j+1);
 					casillaAEvaluar = Tablero.matriz[i][j+1];
 				}
 				break;
-	
+
 			case IZQUIERDA:
 				if(j>0){
 					nuevaPosicion = new Posicion(i,j-1);
 					casillaAEvaluar = Tablero.matriz[i][j-1];
 				}
 				break;
-				
+
 			default:
 				this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 				return false;
 			}
-			
-			if(casillaAEvaluar != null 
+
+			if(casillaAEvaluar != null
 					&& (casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H"))){
 				if(casillaAEvaluar.startsWith("H")){
 					TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
@@ -504,12 +508,12 @@ public class Agente {
 				}
 				else
 					Tablero.matriz[this.getPosicion().getI()][this.getPosicion().getJ()] = "-";
-				
+
 				Tablero.matriz[nuevaPosicion.getI()][nuevaPosicion.getJ()] = this.getId();
 				this.setPosicion(nuevaPosicion); //Actualizamos la posicion del agente
 				this.setResultado(nuevaPosicion, true, casillaAEvaluar);
 				TableroGrafico.actualizaPosicionAgente(this.getId());
-				
+
 				cantCorrecionMov--;
 				try {
 					Thread.sleep(500);
@@ -526,24 +530,38 @@ public class Agente {
 				//movimiento++;
 			}
 			movimiento++;
-			
+
 		}
 		return true;
-	
+
 	}
 
 	/**
 	 * Metodo que permite que el agente regrese a la nave
-	 * a traves de ir calculando en que direccion relativa 
-	 * a el se encuentra la nave e irse acercando cada vez mas
-	 * a ella
-	 * 
+	 * a traves del metodo irAPosicion
+	 *
 	 * @return
 	 */
 	public synchronized boolean regresarANave(){
-		int iRelativa = this.getPosicion().getI() - Tablero.posicionNave.getI(); 
-		int jRelativa = this.getPosicion().getJ() - Tablero.posicionNave.getJ();
-	
+		return irAPosicion(Tablero.posicionNave);
+	}
+
+	public synchronized boolean irAMonitculo(Posicion posicionMonticulo){
+		return irAPosicion(posicionMonticulo);
+	}
+
+	/**
+	 * Metodo que permite que el agente valla a una posicion
+	 * a traves de ir calculando en que direccion relativa
+	 * a el se encuentra la posicion e irse acercando cada vez mas
+	 * a ella
+	 *
+	 * @return
+	 */
+	public synchronized boolean irAPosicion(Posicion posicionALlegar){
+		int iRelativa = this.getPosicion().getI() - posicionALlegar.getI();
+		int jRelativa = this.getPosicion().getJ() - posicionALlegar.getJ();
+
 		if(iRelativa == 0){
 			if(jRelativa<0){
 				return this.caminar(DERECHA).isExito();
@@ -551,7 +569,7 @@ public class Agente {
 				return this.caminar(IZQUIERDA).isExito();
 			}
 		}
-	
+
 		if(jRelativa == 0){
 			if(iRelativa<0){
 				return this.caminar(ABAJO).isExito();
@@ -559,7 +577,7 @@ public class Agente {
 				return this.caminar(ARRIBA).isExito();
 			}
 		}
-	
+
 		if(iRelativa < 0){
 			if(jRelativa<0){
 				//1,2,4
@@ -570,7 +588,7 @@ public class Agente {
 				}else{
 					return this.caminar(ABAJO).isExito();
 				}
-				
+
 			}else{
 				//2,3,5
 				if(this.caminar(DIAG_INF_IZQ).isExito()){
@@ -602,37 +620,46 @@ public class Agente {
 		}
 	}
 
+
 	public synchronized boolean cargar(Monticulo monticulo){
 		int cupo = this.getCapacidad() - this.getCargaActual();
 		if(cupo == 0 || monticulo.getPiedras()==0){
 			return false;
 		}
-		
+		if(Tablero.buzon.size() > 0){
+			Tablero.borrarMensaje(monticulo.getPosicion());
+		}
 		while(cupo > 0 && monticulo.getPiedras() > 0){
 			this.setCargaActual(this.getCargaActual() + 1);
 			monticulo.setPiedras(monticulo.getPiedras() - 1);
-			TableroGrafico.replace(TableroGrafico.panelPiedras, 
-									TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(), 
+			TableroGrafico.replace(TableroGrafico.panelPiedras,
+									TableroGrafico.convierteAIndice(monticulo.getPosicion().getI(),
 																	monticulo.getPosicion().getJ()),
 									new JLabel(monticulo.getPiedras()+""));
-			TableroGrafico.replace(TableroGrafico.panelPiedras, 
-					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
+			TableroGrafico.replace(TableroGrafico.panelPiedras,
+					TableroGrafico.convierteAIndice(this.getPosicion().getI(),
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
 			try {
 				Thread.sleep(100); // Para que tarde al cargar
 			} catch (InterruptedException e) {
-				
+
 			}
 			cupo--;
 		}
-		
+
 		if(monticulo.getPiedras() == 0){
 			TableroGrafico.quitaMonticulo(monticulo.getId());
 			Tablero.matriz[monticulo.getPosicion().getI()][monticulo.getPosicion().getJ()] = "-";
 		}
 		else{
-			this.dejarMoronas = true;
+
+			if(Tablero.comunicacionMoronas){
+				this.dejarMoronas = true;
+			}else if(Tablero.comunicacionKQML){
+				this.mandarMensaje(monticulo.getPosicion());
+			}
+
 		}
 		return true;
 	}
@@ -641,36 +668,36 @@ public class Agente {
 		while(this.getCargaActual() > 0){
 			this.setCargaActual(this.getCargaActual() - 1);
 			Tablero.nave.setPiedras(Tablero.nave.getPiedras() + 1);
-			TableroGrafico.replace(TableroGrafico.panelPiedras, 
-					TableroGrafico.convierteAIndice(this.getPosicion().getI(), 
+			TableroGrafico.replace(TableroGrafico.panelPiedras,
+					TableroGrafico.convierteAIndice(this.getPosicion().getI(),
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
-			TableroGrafico.replace(TableroGrafico.panelMenu, 10, 
-					new JLabel("Piedras por dejar en nave: " + 
+			TableroGrafico.replace(TableroGrafico.panelMenu, 10,
+					new JLabel("Piedras por dejar en nave: " +
 							(Tablero.totalPiedras - Tablero.nave.getPiedras())));
 			try {
 				Thread.sleep(100); // Para que tarde al dejar piedras
 			} catch (InterruptedException e) {
-				
+
 			}
 		}
-		
+
 		try {
 			Thread.sleep(100);  //Para que tarde al dejar la ultima piedra.
 		} catch (InterruptedException e) {
-			
+
 		}
 		this.dejarMoronas = false;
 		return true;
 	}
 
 	public synchronized String buscarMoronaCercana(String idMorona){
-		
+
 		int i = this.posicion.getI();
 		int j = this.posicion.getJ();
-		
+
 		ArrayList<Integer> indicesMoronasCercanas = new ArrayList<Integer>();
-		
+
 		for(int movimiento = 0; movimiento <= 7; movimiento++){
 			switch (movimiento) {
 			case DIAG_INF_DER:
@@ -697,7 +724,7 @@ public class Agente {
 				}
 				break;
 			case DIAG_SUP_DER:
-				if(i>0 && j<Tablero.CASILLAS-1 
+				if(i>0 && j<Tablero.CASILLAS-1
 						&& (Tablero.matriz[i-1][j+1].startsWith("H")|| Tablero.matriz[i-1][j+1].startsWith("M"))){
 					if(Tablero.matriz[i-1][j+1].startsWith("M"))
 						return Tablero.matriz[i-1][j+1];
@@ -719,14 +746,14 @@ public class Agente {
 				}
 				break;
 			case DERECHA:
-				if(j < Tablero.CASILLAS -1 
+				if(j < Tablero.CASILLAS -1
 						&& (Tablero.matriz[i][j+1].startsWith("H") || Tablero.matriz[i][j+1].startsWith("M"))){
 					if(Tablero.matriz[i][j+1].startsWith("M"))
 						return Tablero.matriz[i][j+1];
 					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i][j+1].substring(1)));
 				}
 				break;
-	
+
 			case IZQUIERDA:
 				if(j>0 && (Tablero.matriz[i][j-1].startsWith("H") || Tablero.matriz[i][j-1].startsWith("M"))){
 					if(Tablero.matriz[i][j-1].startsWith("M"))
@@ -734,11 +761,11 @@ public class Agente {
 					indicesMoronasCercanas.add(Integer.parseInt(Tablero.matriz[i][j-1].substring(1)));
 				}
 				break;
-			default:			
+			default:
 				break;
 			}
 		}
-		
+
 		if(indicesMoronasCercanas.size() > 0){
 			Collections.sort(indicesMoronasCercanas);
 			if(indicesMoronasCercanas.indexOf(Integer.parseInt(idMorona.substring(1)) - 1) != -1)
@@ -750,11 +777,11 @@ public class Agente {
 			return "";
 		}
 	}
-	
+
 	public synchronized boolean seguirMoronas(String idMorona){
-		
+
 		boolean exito = false;
-		
+
 		while(this.buscarMoronaCercana(idMorona) != ""){
 			if(this.buscarMoronaCercana(idMorona).startsWith("M")){
 				Monticulo monticuloEncontrado = (Monticulo)Tablero.obtenerElementoConId(
@@ -773,8 +800,40 @@ public class Agente {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return exito;
 	}
+
+
+	public synchronized void mandarMensaje(Posicion posicionMonticulo){
+		Tablero.buzon.add(new MensajeInformativo(posicionMonticulo, this.id));
+
+	}
+
+	public synchronized boolean leerBuzon(){
+		int iMenor = 8;
+		int jMenor = 8;
+		MensajeInformativo mensajeCercano = null;
+		for (MensajeInformativo mensajeIterado : Tablero.buzon) {
+			int iRelativa = Math.abs(this.getPosicion().getI() - mensajeIterado.getPosicionMonticulo().getI());
+			int jRelativa = Math.abs(this.getPosicion().getJ() - mensajeIterado.getPosicionMonticulo().getJ());
+
+			if (iRelativa <= 7 && jRelativa <= 7){
+				if (iRelativa + jRelativa < iMenor + jMenor){
+					iMenor = iRelativa;
+					jMenor = jRelativa;
+					mensajeCercano = mensajeIterado;
+				}
+			}
+		}
+		if(mensajeCercano != null){
+			return this.irAMonitculo(mensajeCercano.getPosicionMonticulo());
+
+		}else{
+			return false;
+		}
+
+	}
+
 
 }
