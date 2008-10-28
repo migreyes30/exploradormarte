@@ -41,7 +41,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 	
 	public static JFrame frame;
 	public static JLayeredPane panelTablero;
-	public static JScrollPane scroll, scroll2;
+	public static JScrollPane scroll;
 	public static JTextArea mensajes, info;
 	private JMenuBar barraMenu;
     private JMenu archivo, ayuda;
@@ -142,7 +142,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		info.append("* Numero de agentes: " + Tablero.listaAgentes.size() + "\n");
 		info.append("* Numero de monticulos: " + Tablero.listaMonticulos.size() + "\n");
 		info.append("* Piedras totales: " + Tablero.totalPiedras + "\n");
-//		info.append("Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
+		info.append("* Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
 		info.append("\n <<MENSAJES>>");
 		info.setEditable(false);
 		info.setBackground(this.getBackground());

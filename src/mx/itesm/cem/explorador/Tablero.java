@@ -65,7 +65,7 @@ public class Tablero {
 		Tablero.setComunicacionMoronas(false);
 
 		Tablero.totalPiedras = 0;
-
+		ThreadAgente.hasNotified = false;
 
 		Tablero.matriz = creaMatriz();
 	}

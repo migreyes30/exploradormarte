@@ -673,7 +673,9 @@ public class Agente {
 					TableroGrafico.convierteAIndice(this.getPosicion().getI(),
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
-			
+			String fixed = TableroGrafico.info.getText().substring(0,TableroGrafico.info.getText().indexOf("* Piedras restantes: "));
+			TableroGrafico.info.setText(fixed + 
+					"* Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
 			try {
 				Thread.sleep(100); // Para que tarde al dejar piedras
 			} catch (InterruptedException e) {
