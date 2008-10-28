@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 import mx.itesm.cem.grafico.TableroGrafico;
@@ -672,9 +673,7 @@ public class Agente {
 					TableroGrafico.convierteAIndice(this.getPosicion().getI(),
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
-			TableroGrafico.replace(TableroGrafico.panelMenu, 10,
-					new JLabel("Piedras por dejar en nave: " +
-							(Tablero.totalPiedras - Tablero.nave.getPiedras())));
+			
 			try {
 				Thread.sleep(100); // Para que tarde al dejar piedras
 			} catch (InterruptedException e) {
@@ -806,7 +805,24 @@ public class Agente {
 
 
 	public synchronized void mandarMensaje(Posicion posicionMonticulo){
-		Tablero.buzon.add(new MensajeInformativo(posicionMonticulo, this.id));
+		Tablero.buzon.add(new MensajeInformativo(posicionMonticulo, this.getId()));
+		String msj = "(Informar\n" +
+					 "\t:sender " + this.getId() + "\n" +
+					 "\t:language Español \n" +
+					 "\t:ontology Marte \n" +
+					 "\t:content Hay un monticulo en " + 
+						posicionMonticulo.getI() + ", " +
+						posicionMonticulo.getJ() + "\n" +
+					 ")\n\n";
+		
+		TableroGrafico.mensajes.append(msj);
+
+		SwingUtilities.invokeLater(new Runnable() {
+		        public void run() {
+		              TableroGrafico.mensajes.setCaretPosition(
+		            		  	TableroGrafico.mensajes.getText().length());
+		        }
+		      });
 
 	}
 
@@ -827,7 +843,13 @@ public class Agente {
 			}
 		}
 		if(mensajeCercano != null){
-			return this.irAMonitculo(mensajeCercano.getPosicionMonticulo());
+			if(!Tablero.matriz[mensajeCercano.getPosicionMonticulo().getI()]
+			                 [mensajeCercano.getPosicionMonticulo().getJ()].startsWith("M")){
+				Tablero.buzon.remove(mensajeCercano);
+				return false;
+			}
+			else
+				return this.irAMonitculo(mensajeCercano.getPosicionMonticulo());
 
 		}else{
 			return false;

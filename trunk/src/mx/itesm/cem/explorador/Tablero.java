@@ -276,6 +276,7 @@ public class Tablero {
 		for (MensajeInformativo mensajeIterado : Tablero.buzon) {
 			if (mensajeIterado.getPosicionMonticulo() == posicionMonticulo){
 				mensajeABorrar = mensajeIterado;
+				break;
 			}
 		}
 		if(mensajeABorrar != null){
