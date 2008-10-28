@@ -15,23 +15,22 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 1L;
 	private static final int ANCHO = 371;
-	private static final int ALTO = 700;
+	private static final int ALTO = 720;
 	private static final int LIMITE_CARACTERES = 6;
 	private static final int ANCHO_TEXTFIELD = 50;
 	private static final int ALTO_TEXTFIELD = 20;
 	private static final int NUM_CAPAS = 5;
-	private Box tituloBox, opcionesBox, entradasBox, capasLeftBox, capasRightBox, botonesBox ;
+	private Box tituloBox, opcionesBox, entradasBox, capasLeftBox, capasCenterBox, capasRightBox, botonesBox ;
 	public JPanel botonesPanel;
 	public JButton aceptarButton, borrarButton;
 	public JTextField monticulosTxt, obstaculosTxt, agentesTxt  = new JTextField("");
 	public int numPiedras, numMonticulos, numObstaculos, numAgentes;
 	public boolean datosValidos;
-	private JComboBox ordenEvitarObstaculos;
-	private JComboBox ordenLlevarPiedras;
-	private JComboBox ordenRecolectarMuestras;
-	private JComboBox ordenMoronas;
-	private JComboBox ordenExplorar;
-	
+	private JComboBox ordenEvitarObstaculos, ordenLlevarPiedras, 
+					  ordenRecolectarMuestras,ordenMoronas,
+					  ordenKQML, ordenExplorar;
+	private JCheckBox usarMoronas, usarKQML;
+	private int tipoComunicacion;
 	
 	public PantallaDeBienvenida(){
 					
@@ -47,6 +46,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.entradasBox = Box.createVerticalBox();
 		this.botonesBox = Box.createHorizontalBox();
 		this.capasLeftBox = Box.createVerticalBox();
+		this.capasCenterBox = Box.createVerticalBox();
 		this.capasRightBox = Box.createVerticalBox();
 		
 		this.botonesPanel = new JPanel();
@@ -121,6 +121,12 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		ordenMoronas = new JComboBox(ordenCapaArray);
 		ordenMoronas.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
 		ordenMoronas.setSelectedIndex(3);
+		ordenMoronas.setEnabled(false);
+		
+		ordenKQML = new JComboBox(ordenCapaArray);
+		ordenKQML.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
+		ordenKQML.setSelectedIndex(3);
+		ordenKQML.setEnabled(false);
 		
 		ordenExplorar = new JComboBox(ordenCapaArray);
 		ordenExplorar.setMaximumSize(new Dimension(ANCHO_TEXTFIELD, ALTO_TEXTFIELD));
@@ -131,7 +137,18 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		JLabel llevarPiedrasLbl = new JLabel("2. Llevar piedras: ");
 		JLabel recolectarMuestrasLbl = new JLabel("3. Recolectar piedras: ");
 		JLabel moronasLbl = new JLabel("4. Seguir moronas: ");
+		JLabel kqmlLabel = new JLabel("4. Comunicación KQML: ");
 		JLabel explorarLbl = new JLabel("5. Explorar: ");
+		
+		this.usarMoronas = new JCheckBox("Usar moronas");
+		this.usarKQML = new JCheckBox("Usar KQML");
+		
+		this.usarMoronas.addActionListener(this);
+		this.usarKQML.addActionListener(this);
+		
+		//Para que al hacer click no se dibuje un recuadro alrededor
+		usarMoronas.setFocusable(false);
+		usarKQML.setFocusable(false);
 		
 		
 		this.capasLeftBox.add(evitarObstaculosLbl);
@@ -142,20 +159,28 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
 		this.capasLeftBox.add(moronasLbl);
 		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
+		this.capasLeftBox.add(kqmlLabel);
+		this.capasLeftBox.add(Box.createRigidArea(new Dimension(20,45)));
 		this.capasLeftBox.add(explorarLbl);
 		
 		
-		this.capasRightBox.add(Box.createVerticalStrut(20));
-		this.capasRightBox.add(ordenEvitarObstaculos);
-		this.capasRightBox.add(Box.createVerticalStrut(40));
-		this.capasRightBox.add(ordenLlevarPiedras);
-		this.capasRightBox.add(Box.createVerticalStrut(40));
-		this.capasRightBox.add(ordenRecolectarMuestras);
-		this.capasRightBox.add(Box.createVerticalStrut(40));
-		this.capasRightBox.add(ordenMoronas);
-		this.capasRightBox.add(Box.createVerticalStrut(40));
-		this.capasRightBox.add(ordenExplorar);
+		this.capasCenterBox.add(Box.createVerticalStrut(28));
+		this.capasCenterBox.add(ordenEvitarObstaculos);
+		this.capasCenterBox.add(Box.createVerticalStrut(40));
+		this.capasCenterBox.add(ordenLlevarPiedras);
+		this.capasCenterBox.add(Box.createVerticalStrut(40));
+		this.capasCenterBox.add(ordenRecolectarMuestras);
+		this.capasCenterBox.add(Box.createVerticalStrut(40));
+		this.capasCenterBox.add(ordenMoronas);
+		this.capasCenterBox.add(Box.createVerticalStrut(40));
+		this.capasCenterBox.add(ordenKQML);
+		this.capasCenterBox.add(Box.createVerticalStrut(40));
+		this.capasCenterBox.add(ordenExplorar);
 		
+		this.capasRightBox.add(Box.createVerticalStrut(120));
+		this.capasRightBox.add(usarMoronas);
+		this.capasRightBox.add(Box.createVerticalStrut(40));
+		this.capasRightBox.add(usarKQML);
 		
 		JPanel tituloPanel = new JPanel();
 		tituloPanel.add(tituloBox);
@@ -169,7 +194,8 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 
 		JPanel capasPanel = new JPanel();
 		capasPanel.add(capasLeftBox, BorderLayout.WEST);
-		capasPanel.add(capasRightBox, BorderLayout.CENTER);
+		capasPanel.add(capasCenterBox, BorderLayout.CENTER);
+		capasPanel.add(capasRightBox, BorderLayout.EAST);
 		
 		JPanel parametrosPanel = new JPanel();
 		parametrosPanel.add(tituloPanel, BorderLayout.NORTH);
@@ -234,7 +260,12 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 				capasIntroducidas[Integer.parseInt(ordenEvitarObstaculos.getSelectedItem().toString())- 1] = 1;  	// 1 = Evitar Obstaculo
 				capasIntroducidas[Integer.parseInt(ordenLlevarPiedras.getSelectedItem().toString())- 1] = 2; 		// 2 = Regresar a nave
 				capasIntroducidas[Integer.parseInt(ordenRecolectarMuestras.getSelectedItem().toString()) - 1] = 3; 	// 3 = Cargar
-				capasIntroducidas[Integer.parseInt(ordenMoronas.getSelectedItem().toString()) - 1] = 4;				// 4 = Moronas
+				
+				if (this.usarMoronas.isEnabled()){
+					capasIntroducidas[Integer.parseInt(ordenMoronas.getSelectedItem().toString()) - 1] = 4;				// 4 = Moronas					
+				} else {
+					capasIntroducidas[Integer.parseInt(ordenKQML.getSelectedItem().toString()) - 1] = 4;					// 4 = KQML
+				}
 				capasIntroducidas[Integer.parseInt(ordenExplorar.getSelectedItem().toString()) - 1] = 5;			// 5 = Explorar
 				
 				if(this.validarCapas(capasIntroducidas)){
@@ -253,7 +284,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 					else{
 						this.setVisible(false);
 						
-						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes);
+						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes, tipoComunicacion);
 						Tablero.capas = capasIntroducidas;
 						System.out.println(tb.toString());
 						
@@ -261,7 +292,7 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 						for(int i=0; i < Tablero.listaAgentes.size(); i++)
 							new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidas, tg);
 					}
-				}else{
+				} else{
 					JOptionPane.showMessageDialog(this, "Dos capas no puden tener la misma prioridad", "Orden de capas", JOptionPane.ERROR_MESSAGE);	
 				}
 				
@@ -269,12 +300,45 @@ public class PantallaDeBienvenida extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(this, "Debes llenar todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
 			}
 						
-		}else if (e.getSource() == this.borrarButton){
+		} else if (e.getSource() == this.borrarButton){
 			
 			this.monticulosTxt.setText("");
 			this.obstaculosTxt.setText("");
-			this.agentesTxt.setText("");			
-		}	
+			this.agentesTxt.setText("");
+			
+		} else if (e.getSource() == this.usarMoronas){
+			
+			if (!this.ordenMoronas.isEnabled()){
+								
+				this.ordenMoronas.setEnabled(true);				
+				this.tipoComunicacion = 1; //El 1 representa el uso de moronas					
+				this.ordenKQML.setEnabled(false);
+				this.usarKQML.setEnabled(false);
+
+			} else {
+				
+				this.tipoComunicacion = 0; //El 0 representa sin comunicacion				
+				this.ordenMoronas.setEnabled(false);
+				this.usarMoronas.setEnabled(true);	
+				this.usarKQML.setEnabled(true);
+			}
+			
+		} else if (e.getSource() == this.usarKQML){
+			
+			if (!this.ordenKQML.isEnabled()){
+				this.ordenKQML.setEnabled(true);
+				
+				this.tipoComunicacion = 2; //El 2 representa el uso de KQML				
+				this.ordenMoronas.setEnabled(false);
+				this.usarMoronas.setEnabled(false);
+			} else {
+				
+				this.tipoComunicacion = 0; //El 0 representa sin comunicacion					
+				this.ordenKQML.setEnabled(false);				
+				this.usarKQML.setEnabled(true);	
+				this.usarMoronas.setEnabled(true);
+			}
+		}
 	}
 
 	public static void main(String[] args) {

@@ -137,8 +137,14 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		info.append("     1. " + Tablero.nombresCapas.get(Tablero.capas[0]) + "\n");
 		info.append("     2. " + Tablero.nombresCapas.get(Tablero.capas[1]) + "\n");
 		info.append("     3. " + Tablero.nombresCapas.get(Tablero.capas[2]) + "\n");
-		info.append("     4. " + Tablero.nombresCapas.get(Tablero.capas[3]) + "\n");
-		info.append("     5. " + Tablero.nombresCapas.get(Tablero.capas[4]) + "\n");
+		
+		if (Tablero.nombresCapas.get(Tablero.capas[3]) != null){
+			info.append("     4. " + Tablero.nombresCapas.get(Tablero.capas[3]) + "\n");
+			info.append("     5. " + Tablero.nombresCapas.get(Tablero.capas[4]) + "\n");
+		} else {
+			info.append("     4. " + Tablero.nombresCapas.get(Tablero.capas[4]) + "\n");
+		}
+		
 		info.append("* Numero de agentes: " + Tablero.listaAgentes.size() + "\n");
 		info.append("* Numero de monticulos: " + Tablero.listaMonticulos.size() + "\n");
 		info.append("* Piedras totales: " + Tablero.totalPiedras + "\n");
