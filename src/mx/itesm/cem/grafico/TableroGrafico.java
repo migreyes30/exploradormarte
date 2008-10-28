@@ -1,5 +1,8 @@
 package mx.itesm.cem.grafico;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +18,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneLayout;
 
 import mx.itesm.cem.explorador.Agente;
 import mx.itesm.cem.explorador.Monticulo;
@@ -29,10 +35,14 @@ import mx.itesm.cem.explorador.exception.NoExisteElementoException;
 public class TableroGrafico extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 1L;
-	public static JPanel panelMatriz,panelPiedras;
+	public static JPanel panelMatriz,
+						 panelPiedras,
+						 panelDerecha;
+	
 	public static JFrame frame;
-	public static JPanel panelMenu;
 	public static JLayeredPane panelTablero;
+	public static JScrollPane scroll, scroll2;
+	public static JTextArea mensajes, info;
 	private JMenuBar barraMenu;
     private JMenu archivo, ayuda;
     private JMenuItem inicio, salir, acerca;
@@ -51,23 +61,26 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		TableroGrafico.listaMoronasGraficas = new ArrayList<MoronaGrafica>();
 		
 		this.setTitle("Explorador Marte");
-		this.setSize(815,695);
+		this.setSize(910,695);
 		
-		panelMenu = new JPanel();
+		panelDerecha = new JPanel();
+		
 		panelTablero = new JLayeredPane();
 		
 		panelMatriz = new JPanel();
 		panelPiedras = new JPanel();
 		
+		scroll = new JScrollPane();
+		
 		this.getContentPane().setLayout(new BorderLayout());		
 		panelMatriz.setLayout(new GridLayout(15,15));
 		panelPiedras.setLayout(new GridLayout(15,15));
+		scroll.setLayout(new ScrollPaneLayout());
+		panelDerecha.setLayout(new BorderLayout());
 		
 		ImageIcon fondo = new ImageIcon(getClass().getResource("Mars_atmosphere.jpg"));
 		JLabel labelFondo = new JLabel(fondo);
 		labelFondo.setSize(fondo.getIconWidth(), fondo.getIconHeight());
-		
-		panelMenu.setLayout(new GridLayout(11,1));
 		
 		panelMatriz.setOpaque(false);
 		panelMatriz.setSize(630, 630);
@@ -118,20 +131,37 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		
 		inicializaTablero();
 		
-		panelMenu.add(new JLabel("-----INFORMACION-----"));
-		panelMenu.add(new JLabel("Orden de capas"));
-		panelMenu.add(new JLabel("1. " + Tablero.nombresCapas.get(Tablero.capas[0])));
-		panelMenu.add(new JLabel("2. " + Tablero.nombresCapas.get(Tablero.capas[1])));
-		panelMenu.add(new JLabel("3. " + Tablero.nombresCapas.get(Tablero.capas[2])));
-		panelMenu.add(new JLabel("4. " + Tablero.nombresCapas.get(Tablero.capas[3])));
-		panelMenu.add(new JLabel("5. " + Tablero.nombresCapas.get(Tablero.capas[4])));
-		panelMenu.add(new JLabel("Numero de agentes: " + Tablero.listaAgentes.size()));
-		panelMenu.add(new JLabel("Numero de monticulos: " + Tablero.listaMonticulos.size()));
-		panelMenu.add(new JLabel("Piedras totales: " + Tablero.totalPiedras));
-		panelMenu.add(new JLabel("Piedras por dejar en nave: " + (Tablero.totalPiedras - Tablero.nave.getPiedras())));
+		info = new JTextArea();
+		info.append("\t<<INFORMACION>>\n");
+		info.append("* Orden de capas\n");
+		info.append("     1. " + Tablero.nombresCapas.get(Tablero.capas[0]) + "\n");
+		info.append("     2. " + Tablero.nombresCapas.get(Tablero.capas[1]) + "\n");
+		info.append("     3. " + Tablero.nombresCapas.get(Tablero.capas[2]) + "\n");
+		info.append("     4. " + Tablero.nombresCapas.get(Tablero.capas[3]) + "\n");
+		info.append("     5. " + Tablero.nombresCapas.get(Tablero.capas[4]) + "\n");
+		info.append("* Numero de agentes: " + Tablero.listaAgentes.size() + "\n");
+		info.append("* Numero de monticulos: " + Tablero.listaMonticulos.size() + "\n");
+		info.append("* Piedras totales: " + Tablero.totalPiedras + "\n");
+//		info.append("Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
+		info.append("\n <<MENSAJES>>");
+		info.setEditable(false);
+		info.setBackground(this.getBackground());
+		info.setFont(new Font("Arial", Font.BOLD, 12));
+		
+		mensajes = new JTextArea();
+		mensajes.setFont(new Font("Arial",Font.PLAIN, 11));
+		mensajes.setForeground(new Color(0, 0, 255));
+		mensajes.setEditable(false);
+		
+		
+		scroll.setViewportView(mensajes);
+		scroll.setPreferredSize(new Dimension(260,100));
+		
+		panelDerecha.add(BorderLayout.NORTH, info);
+		panelDerecha.add(BorderLayout.CENTER, scroll);
 		
 		this.getContentPane().add(BorderLayout.CENTER, panelTablero);
-		this.getContentPane().add(BorderLayout.EAST, panelMenu);
+		this.getContentPane().add(BorderLayout.EAST, panelDerecha);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}
