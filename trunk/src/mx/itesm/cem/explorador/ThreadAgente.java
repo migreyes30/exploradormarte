@@ -11,7 +11,7 @@ public class ThreadAgente implements Runnable{
 	private Agente agente;
 	private int[] capas;
 	private TableroGrafico tg;
-	private static boolean hasNotified = false;
+	public static boolean hasNotified = false;
 	
 	
 	public ThreadAgente(Agente agente, int[] capas, TableroGrafico tg){
