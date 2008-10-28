@@ -43,7 +43,7 @@ public class Tablero {
 
 	public static int maxIdMorona = 0;
 
-	public Tablero(int numMonticulos, int numObstaculos, int numAgentes){
+	public Tablero(int numMonticulos, int numObstaculos, int numAgentes, int comunicacion){
 
 		Tablero.NUM_MONTICULOS = numMonticulos;
 		Tablero.NUM_OBSTACULOS = numObstaculos;
@@ -52,7 +52,7 @@ public class Tablero {
 		nombresCapas.put(new Integer(1), "Evitar Obstaculo");
 		nombresCapas.put(new Integer(2), "Regresar a Nave");
 		nombresCapas.put(new Integer(3), "Cargar piedras");
-		nombresCapas.put(new Integer(4), "Seguir Moronas");
+		
 		nombresCapas.put(new Integer(5), "Explorar");
 
 		Tablero.listaAgentes = new ArrayList<Agente>();
@@ -61,9 +61,17 @@ public class Tablero {
 		Tablero.listaMoronas = new ArrayList<Morona>();
 		Tablero.buzon = new ArrayList<MensajeInformativo>();
 		
-		Tablero.setComunicacionKQML(true);
-		Tablero.setComunicacionMoronas(false);
-
+		switch (comunicacion) {
+		case 0: 
+			break;
+				
+		case 1: Tablero.comunicacionMoronas = true;
+				nombresCapas.put(new Integer(4), "Seguir Moronas");
+			break;
+		case 2: Tablero.comunicacionKQML = true;
+				nombresCapas.put(new Integer(4), "Comunicación KQML");
+			break;
+		}
 		Tablero.totalPiedras = 0;
 		ThreadAgente.hasNotified = false;
 
