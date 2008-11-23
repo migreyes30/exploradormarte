@@ -245,8 +245,10 @@ public class Agente {
 		if(casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H")){
 			if(casillaAEvaluar.startsWith("H")){
 				TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+				int indiceMoronaARemover= Tablero.obtenerIndiceDeObjeto(casillaAEvaluar);
 				try{
-					Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+					Tablero.listaMoronas.remove(indiceMoronaARemover);
+					TableroGrafico.listaMoronasGraficas.remove(indiceMoronaARemover);
 				}catch(NoExisteElementoException e){
 					e.printStackTrace();
 				}
@@ -353,8 +355,10 @@ public class Agente {
 		if(casillaAEvaluar == "-" || casillaAEvaluar.startsWith("H")){
 			if(casillaAEvaluar.startsWith("H")){
 				TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+				int indiceMoronaARemover= Tablero.obtenerIndiceDeObjeto(casillaAEvaluar);
 				try{
-					Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+					Tablero.listaMoronas.remove(indiceMoronaARemover);
+					TableroGrafico.listaMoronasGraficas.remove(indiceMoronaARemover);
 				}catch(NoExisteElementoException e){
 					e.printStackTrace();
 				}
@@ -394,8 +398,10 @@ public class Agente {
 
 	if(casillaAEvaluar.startsWith("H")){
 		TableroGrafico.quitaMoronaGrafica(casillaAEvaluar);
+		int indiceMoronaARemover= Tablero.obtenerIndiceDeObjeto(casillaAEvaluar);
 		try{
-			Tablero.listaMoronas.remove(Tablero.obtenerIndiceDeObjeto(casillaAEvaluar));
+			Tablero.listaMoronas.remove(indiceMoronaARemover);
+			TableroGrafico.listaMoronasGraficas.remove(indiceMoronaARemover);
 		}catch(NoExisteElementoException e){
 			e.printStackTrace();
 		}
