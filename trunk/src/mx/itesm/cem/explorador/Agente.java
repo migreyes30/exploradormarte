@@ -11,11 +11,11 @@ import mx.itesm.cem.grafico.TableroGrafico;
 
 public class Agente {
 
-	private Posicion posicion;
-	private int capacidad = 0;
-	private int cargaActual;
-	private String id;
-	private ResultadoCaminar resultado = new ResultadoCaminar();
+	protected Posicion posicion;
+	protected int capacidad = 0;
+	protected int cargaActual;
+	protected String id;
+	protected ResultadoCaminar resultado = new ResultadoCaminar();
 	public static final int ABAJO = 2;
 	public static final int ARRIBA = 5;
 	public static final int IZQUIERDA = 7;
@@ -134,7 +134,7 @@ public class Agente {
 						System.out.println("Ejecutando Capa 4 KQML");
 						exito = this.leerBuzon();
 						if(!exito & this.buscarMoronaCercana(this.resultado.getOcupacion()).startsWith("M")){
-								Monticulo monticuloEncontrado = 
+								Monticulo monticuloEncontrado =
 									(Monticulo)Tablero.obtenerElementoConId(this.buscarMoronaCercana(this.resultado.getOcupacion()));
 								this.caminar(monticuloEncontrado.getPosicion());
 								exito = true;
@@ -680,7 +680,7 @@ public class Agente {
 													this.getPosicion().getJ()),
 					new JLabel(this.getCargaActual()+""));
 			String fixed = TableroGrafico.info.getText().substring(0,TableroGrafico.info.getText().indexOf("* Piedras restantes: "));
-			TableroGrafico.info.setText(fixed + 
+			TableroGrafico.info.setText(fixed +
 					"* Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
 			try {
 				Thread.sleep(100); // Para que tarde al dejar piedras
@@ -813,16 +813,18 @@ public class Agente {
 
 
 	public synchronized void mandarMensaje(Posicion posicionMonticulo){
-		Tablero.buzon.add(new MensajeInformativo(posicionMonticulo, this.getId()));
+		String idMonticulo = Tablero.matriz[posicionMonticulo.getI()][posicionMonticulo.getJ()];
+		Monticulo monti = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
+		Tablero.buzon.add(new MensajeInformativo(posicionMonticulo, this.getId(), monti.piedras));
 		String msj = "(Informar\n" +
 					 "\t:sender " + this.getId() + "\n" +
 					 "\t:language Español \n" +
 					 "\t:ontology Marte \n" +
-					 "\t:content Hay un monticulo en " + 
+					 "\t:content Hay un monticulo en " +
 						posicionMonticulo.getI() + ", " +
 						posicionMonticulo.getJ() + "\n" +
 					 ")\n\n";
-		
+
 		TableroGrafico.mensajes.append(msj);
 
 		SwingUtilities.invokeLater(new Runnable() {
