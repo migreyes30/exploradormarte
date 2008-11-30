@@ -1,14 +1,11 @@
 package mx.itesm.cem.grafico;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.ImageIcon;
 
 import mx.itesm.cem.explorador.Posicion;
 
 @SuppressWarnings("serial")
-public class ObstaculoGrafico extends ElementoGrafico implements ActionListener {
+public class ObstaculoGrafico extends ElementoGrafico {
 	
 	public ObstaculoGrafico(String id, Posicion pos){
 		this.id = id;
@@ -16,8 +13,5 @@ public class ObstaculoGrafico extends ElementoGrafico implements ActionListener 
 		this.imagen = new ImageIcon(getClass().getResource("obstaculo.png"));
 		this.setIcon(imagen);		
 	}
-	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }

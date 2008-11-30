@@ -89,33 +89,68 @@ public class AgenteCargador extends Agente {
 			return false;
 		}
 		
-		int premioMayor = 0;
-		MensajeInformativo msjConPremioMayor = null;
+		int premioMayor = 0,
+			iMenor = 8,
+			jMenor = 8;
 		
-		for(int i=0; i < this.buzonInformativo.size(); i++){
-			if((this.buzonInformativo.get(i).getPremio() > premioMayor)
-					&& this.buzonInformativo.get(i).getPremio() >= this.getSalarioMinimo()){
-				msjConPremioMayor = this.buzonInformativo.get(i);
+		MensajeInformativo msjConPremioMayor = null,
+						   mensajeCercano = null;
+		
+		for (MensajeInformativo mensajeIterado : this.buzonInformativo) {
+			int iRelativa = Math.abs(this.getPosicion().getI() - mensajeIterado.getPosicionMonticulo().getI());
+			int jRelativa = Math.abs(this.getPosicion().getJ() - mensajeIterado.getPosicionMonticulo().getJ());
+
+			if (iRelativa <= 7 && jRelativa <= 7){
+				if (iRelativa + jRelativa < iMenor + jMenor){
+					iMenor = iRelativa;
+					jMenor = jRelativa;
+					mensajeCercano = mensajeIterado;
+				}
+			}
+			
+			if((mensajeIterado.getPremio() > premioMayor)
+					&& mensajeIterado.getPremio() >= this.getSalarioMinimo()){
+				msjConPremioMayor = mensajeIterado;
 				premioMayor = msjConPremioMayor.getPremio();
-			}				
+			}	
 		}
 		
 		if(msjConPremioMayor == null){
-			for(int i=0; i < this.buzonInformativo.size(); i++){
-				this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, "No cumple con salario minimo");
-				this.buzonInformativo.clear();
+			if(mensajeCercano == null){
+				for(int i=0; i < this.buzonInformativo.size(); i++){
+					this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
+												"No cumple con salario minimo y esta fuera de rango");
+					this.buzonInformativo.clear();
+				}
+			}
+			else{
+				this.mandarMensajeAceptacion(mensajeCercano.getSender(), true, 
+						"Puedo ir a monticulo en posicion " + 
+						mensajeCercano.getPosicionMonticulo().getI() + ", " +
+						mensajeCercano.getPosicionMonticulo().getJ());
+				
+				this.buzonInformativo.remove(msjConPremioMayor);
+
+				for(int i=0; i < this.buzonInformativo.size(); i++){
+					this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
+							"No cumple con salario minimo y encontre un monticulo cercano");
+					this.buzonInformativo.clear();
+				}
 			}
 			
 		}
 		else{
 			
-			// AGREGAR RANGO
+			this.mandarMensajeAceptacion(msjConPremioMayor.getSender(), true, 
+					"Puedo ir a monticulo en posicion " + 
+					mensajeCercano.getPosicionMonticulo().getI() + ", " +
+					mensajeCercano.getPosicionMonticulo().getJ());
 			
-			this.mandarMensajeAceptacion(msjConPremioMayor.getSender(), true, "OK");
 			this.buzonInformativo.remove(msjConPremioMayor);
 
 			for(int i=0; i < this.buzonInformativo.size(); i++){
-				this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, "No cumple con salario minimo");
+				this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
+						"Encontre un monticulo con mayor oferta");
 				this.buzonInformativo.clear();
 			}
 		}
