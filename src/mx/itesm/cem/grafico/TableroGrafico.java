@@ -149,7 +149,6 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		info.append("* Numero de monticulos: " + Tablero.listaMonticulos.size() + "\n");
 		info.append("* Piedras totales: " + Tablero.totalPiedras + "\n");
 		info.append("* Piedras restantes: " + (Tablero.totalPiedras - Tablero.nave.getPiedras()) + "\n");
-		info.append("\n <<MENSAJES>>");
 		info.setEditable(false);
 		info.setBackground(this.getBackground());
 		info.setFont(new Font("Arial", Font.BOLD, 12));
