@@ -62,6 +62,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		
 		this.setTitle("Explorador Marte");
 		this.setSize(910,695);
+		this.setLocationRelativeTo(null);
 		
 		panelDerecha = new JPanel();
 		
@@ -318,7 +319,7 @@ public class TableroGrafico extends JFrame implements ActionListener{
 		if(e.getSource() == inicio){
 			int opcion = JOptionPane.showConfirmDialog(this, "Se cerrará esta simulacion y volverás al inicio. ¿Estás seguro?");
 			if(opcion == JOptionPane.YES_OPTION){
-				new PantallaDeBienvenida();
+				new PantallaSeleccion();
 				this.setVisible(false);
 			}
 		}

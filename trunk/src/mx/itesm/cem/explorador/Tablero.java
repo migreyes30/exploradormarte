@@ -26,7 +26,8 @@ public class Tablero {
 	public static String[][] matriz;
 	public static int NUM_MONTICULOS;
 	public static int NUM_OBSTACULOS;
-	public static int NUM_AGENTES;
+	public static int NUM_CARGADORES;
+	public static int NUM_EXPLORADORES;
 	public static int totalPiedras;
 	public static final int CASILLAS = 15;
 	public static Posicion posicionNave;
@@ -40,14 +41,18 @@ public class Tablero {
 	public static ArrayList<MensajeInformativo> buzon;
 	public static boolean comunicacionMoronas;
 	public static boolean comunicacionKQML;
+	public static boolean redContratantes;
 
 	public static int maxIdMorona = 0;
 
-	public Tablero(int numMonticulos, int numObstaculos, int numAgentes, int comunicacion){
+	public Tablero(int numMonticulos, int numObstaculos, int numCargadores, int numExploradores, int comunicacion, boolean contratantes){
 
 		Tablero.NUM_MONTICULOS = numMonticulos;
 		Tablero.NUM_OBSTACULOS = numObstaculos;
-		Tablero.NUM_AGENTES = numAgentes;
+		Tablero.NUM_CARGADORES = numCargadores;
+		Tablero.NUM_EXPLORADORES = numExploradores;
+		Tablero.redContratantes = contratantes;
+		
 		Tablero.nombresCapas = new HashMap<Integer, String>();
 		nombresCapas.put(new Integer(1), "Evitar Obstaculo");
 		nombresCapas.put(new Integer(2), "Regresar a Nave");
@@ -96,7 +101,8 @@ public class Tablero {
 		}
 
 		int iAzar, jAzar;
-		int cantAgente = Tablero.NUM_AGENTES;
+		int cantCargadores = Tablero.NUM_CARGADORES;
+		int cantExploradores = Tablero.NUM_EXPLORADORES;
 		int	cantMonticulo = Tablero.NUM_MONTICULOS;
 		int cantObstaculo = Tablero.NUM_OBSTACULOS;
 
@@ -142,17 +148,36 @@ public class Tablero {
 
 		}
 
-		/*Insertando Agentes*/
-		while(cantAgente > 0){
+		/*Insertando exploradores*/
+		while(cantExploradores > 0){
 			iAzar = (int)(Math.random()* CASILLAS);
 			jAzar = (int)(Math.random()* CASILLAS);
 
 			if(mat[iAzar][jAzar] == "-"){
 				String id = "A" + (int)(Math.random()*35536);
 				mat[iAzar][jAzar] = id;
-				Tablero.listaAgentes.add(new Agente(id,
+				Tablero.listaAgentes.add(new AgenteExplorador(id,
 											new Posicion(iAzar,jAzar)));
-				cantAgente--;
+				cantExploradores--;
+			}
+
+		}
+		
+		/*Insertando cargadores*/
+		while(cantCargadores > 0){
+			iAzar = (int)(Math.random()* CASILLAS);
+			jAzar = (int)(Math.random()* CASILLAS);
+
+			if(mat[iAzar][jAzar] == "-"){
+				String id = "A" + (int)(Math.random()*35536);
+				mat[iAzar][jAzar] = id;
+				if (Tablero.redContratantes){
+					Tablero.listaAgentes.add(new AgenteCargador(id, new Posicion(iAzar,jAzar)));	
+				} else {
+					Tablero.listaAgentes.add(new Agente(id, new Posicion(iAzar,jAzar)));
+				}
+				
+				cantCargadores--;
 			}
 
 		}
