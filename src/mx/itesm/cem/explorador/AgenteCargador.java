@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class AgenteCargador extends Agente {
 	
 	private int salarioMinimo = 0;
-	private ArrayList<MensajeInformativo> buzonInformativo;
-	private ArrayList<MensajeContratacion> buzonContratacion;
+	public ArrayList<MensajeInformativo> buzonInformativo;
+	public ArrayList<MensajeContratacion> buzonContratacion;
 	
 	public AgenteCargador(String id, Posicion pos) {
 		super(id, pos);
@@ -161,9 +161,8 @@ public class AgenteCargador extends Agente {
 	}
 	public void mandarMensajeAceptacion(String receiver, boolean aceptacion, String razon){
 		
-		MensajeAceptacion msj = new MensajeAceptacion(
-										this.getId(), receiver, aceptacion, razon);
-		AgenteExplorador explorador = (AgenteExplorador)Tablero.obtenerElementoConId(receiver);
+		MensajeAceptacion msj = new MensajeAceptacion(this.getId(), receiver, aceptacion, razon);
+		AgenteExplorador explorador = (AgenteExplorador) Tablero.obtenerElementoConId(receiver);
 		explorador.buzonAceptacion.add(msj);
 	}
 	
