@@ -1,14 +1,11 @@
 package mx.itesm.cem.grafico;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.ImageIcon;
 
 import mx.itesm.cem.explorador.Posicion;
 
 @SuppressWarnings("serial")
-public class MoronaGrafica extends ElementoGrafico implements ActionListener {
+public class MoronaGrafica extends ElementoGrafico {
 	
 	public MoronaGrafica(String id, Posicion pos){
 		this.id = id;
@@ -16,7 +13,5 @@ public class MoronaGrafica extends ElementoGrafico implements ActionListener {
 		this.imagen = new ImageIcon(getClass().getResource("hueso.png"));
 		this.setIcon(imagen);		
 	}
-	public void actionPerformed(ActionEvent ae) {
-		
-	}
+	
 }
