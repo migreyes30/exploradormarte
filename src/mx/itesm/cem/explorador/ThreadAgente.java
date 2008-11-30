@@ -28,7 +28,12 @@ public class ThreadAgente implements Runnable{
 		while(!Tablero.isTerminado()){
 			agente.actuar(capas);
 			try {
-				Thread.sleep(500);
+				if(agente instanceof AgenteExplorador){
+					Thread.sleep(500);
+				} else {
+					Thread.sleep(400);
+				}
+				
 			} catch (InterruptedException e) {
 
 			}
