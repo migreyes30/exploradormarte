@@ -2,6 +2,11 @@ package mx.itesm.cem.explorador;
 
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
+import mx.itesm.cem.explorador.exception.NoExisteElementoException;
+import mx.itesm.cem.grafico.TableroGrafico;
+
 
 public class AgenteExplorador extends Agente {
 
@@ -91,18 +96,42 @@ public class AgenteExplorador extends Agente {
 		if(mensajesPositivos.size() == 1){
 			// winner
 			String idMonticulo = Tablero.matriz[this.getMensajeInformativo().getPosicionMonticulo().getI()][this.getMensajeInformativo().getPosicionMonticulo().getJ()];
-			Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
-			monticulo.setContratoAbierto(false);
-			MensajeContratacion mensajeContratacion = new MensajeContratacion(
-														this.getId(), mensajesPositivos.get(0).getSender(),
-														this.getMensajeInformativo().getPremio(), 
-														this.getMensajeInformativo().getNumPiedras(),
-														this.getMensajeInformativo().getPosicionMonticulo());
-			AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
-			cargador.getBuzonContratacion().add(mensajeContratacion);
-			this.setMensajeInformativo(null);
-			this.getBuzonAceptacion().clear();
-			return true;
+			try{
+				Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
+				monticulo.setContratoAbierto(false);
+				MensajeContratacion mensajeContratacion = new MensajeContratacion(
+															this.getId(), mensajesPositivos.get(0).getSender(),
+															this.getMensajeInformativo().getPremio(), 
+															this.getMensajeInformativo().getNumPiedras(),
+															this.getMensajeInformativo().getPosicionMonticulo());
+				AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
+				cargador.getBuzonContratacion().add(mensajeContratacion);
+				this.setMensajeInformativo(null);
+				this.getBuzonAceptacion().clear();
+				
+				String msj = "(Contratar\n" +
+				 "\t:sender " + this.getId() + "\n" +
+				 "\t:language Español \n" +
+				 "\t:ontology Marte \n" +
+				 "\t:content " + mensajeContratacion.getReceiver() + " ve a monticulo en \n" + 
+				 "\t posicion " + mensajeContratacion.getPosicionMonticulo().getI() + ", " +
+					mensajeContratacion.getPosicionMonticulo().getJ() + "\n" +
+				 ")\n\n";
+
+				TableroGrafico.mensajes.append(msj);
+				
+				SwingUtilities.invokeLater(new Runnable() {
+				   public void run() {
+				         TableroGrafico.mensajes.setCaretPosition(
+				       		  	TableroGrafico.mensajes.getText().length());
+				   }
+				 });
+				
+				return true;
+			}catch(NoExisteElementoException nee){
+				return false;
+			}
+			
 		}else if(mensajesPositivos.size() == 0) {
 			//more reward
 			this.getMensajeInformativo().setPremio(this.getMensajeInformativo().getPremio() + 2);
@@ -111,28 +140,50 @@ public class AgenteExplorador extends Agente {
 		}else {
 			// if(mensajesPositivos.size() > 1 )
 			String idMonticulo = Tablero.matriz[this.getMensajeInformativo().getPosicionMonticulo().getI()][this.getMensajeInformativo().getPosicionMonticulo().getJ()];
-			Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
-			monticulo.setContratoAbierto(false);
-			AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
-			int capacidadMaxima= cargador.getCapacidad();
-			int indexMensaje = 0;
-			for (MensajeAceptacion mensajeIterado : mensajesPositivos) {
-				cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajeIterado.getSender());
-				if(capacidadMaxima < cargador.getCapacidad()){
-					capacidadMaxima = cargador.getCapacidad();
-					indexMensaje = mensajesPositivos.indexOf(mensajeIterado);
+			try{
+				Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
+				monticulo.setContratoAbierto(false);
+				AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
+				int capacidadMaxima= cargador.getCapacidad();
+				int indexMensaje = 0;
+				for (MensajeAceptacion mensajeIterado : mensajesPositivos) {
+					cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajeIterado.getSender());
+					if(capacidadMaxima < cargador.getCapacidad()){
+						capacidadMaxima = cargador.getCapacidad();
+						indexMensaje = mensajesPositivos.indexOf(mensajeIterado);
+					}
 				}
-			}
+	
+				MensajeContratacion mensajeContratacion = new MensajeContratacion(this.getId(), mensajesPositivos.get(indexMensaje).getSender(),
+						this.getMensajeInformativo().getPremio(), this.getMensajeInformativo().getNumPiedras(),
+						this.getMensajeInformativo().getPosicionMonticulo());
+				cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(indexMensaje).getSender());
+				cargador.buzonContratacion.add(mensajeContratacion);
+				
+				String msj = "(Contratar\n" +
+				 "\t:sender " + this.getId() + "\n" +
+				 "\t:language Español \n" +
+				 "\t:ontology Marte \n" +
+				 "\t:content " + mensajeContratacion.getReceiver() + " ve a monticulo en \n" + 
+				 "\t posicion " +  + mensajeContratacion.getPosicionMonticulo().getI() + ", " +
+					mensajeContratacion.getPosicionMonticulo().getJ() + "\n" +
+				 ")\n\n";
 
-			MensajeContratacion mensajeContratacion = new MensajeContratacion(this.getId(), mensajesPositivos.get(indexMensaje).getSender(),
-					this.getMensajeInformativo().getPremio(), this.getMensajeInformativo().getNumPiedras(),
-					this.getMensajeInformativo().getPosicionMonticulo());
-			cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(indexMensaje).getSender());
-			cargador.buzonContratacion.add(mensajeContratacion);
-			
-			this.setMensajeInformativo(null);
-			this.getBuzonAceptacion().clear();
-			return true;
+				TableroGrafico.mensajes.append(msj);
+				
+				SwingUtilities.invokeLater(new Runnable() {
+				   public void run() {
+				         TableroGrafico.mensajes.setCaretPosition(
+				       		  	TableroGrafico.mensajes.getText().length());
+				   }
+				 });
+				
+				this.setMensajeInformativo(null);
+				this.getBuzonAceptacion().clear();
+				return true;
+			}catch(NoExisteElementoException nee){
+				return false;
+			}
 		}
 	}
 
@@ -143,11 +194,29 @@ public class AgenteExplorador extends Agente {
 		MensajeInformativo mensajeInformativo = new MensajeInformativo(monticulo.getPosicion(), this.getId(), monticulo.getPiedras());
 		this.setMensajeInformativo(mensajeInformativo);
 		for (int i = 0; i < Tablero.listaAgentes.size(); i++) {
-			if (Tablero.listaAgentes.get(i).capacidad != 0){
+			if (Tablero.listaAgentes.get(i).capacidad != 0 && !(Tablero.listaAgentes.get(i) instanceof AgenteEspecial)){
 				AgenteCargador cargador =(AgenteCargador)Tablero.listaAgentes.get(i);
 				cargador.getBuzonInformativo().add(mensajeInformativo);
 			}
 		}
+		String msj = "(Informar\n" +
+		 "\t:sender " + this.getId() + "\n" +
+		 "\t:language Español \n" +
+		 "\t:ontology Marte \n" +
+		 "\t:content Hay un monticulo en " +
+			mensajeInformativo.getPosicionMonticulo().getI() + ", " +
+			mensajeInformativo.getPosicionMonticulo().getJ() + "\n" +
+		 "\t\t Ofrezco " + mensajeInformativo.getPremio() + " unidades\n" +
+		 ")\n\n";
+
+		TableroGrafico.mensajes.append(msj);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+		   public void run() {
+		         TableroGrafico.mensajes.setCaretPosition(
+		       		  	TableroGrafico.mensajes.getText().length());
+		   }
+		 });
 		monticulo.setContratoAbierto(true);
 		monticulo.setEnContrato(true);
 		return true;
@@ -156,7 +225,7 @@ public class AgenteExplorador extends Agente {
 	public synchronized  boolean informar(MensajeInformativo mensajeInformativo){
 		boolean alreadyInMailbox = false;
 		for (int i = 0; i < Tablero.listaAgentes.size(); i++) {
-			if (Tablero.listaAgentes.get(i).getCapacidad() != 0){
+			if (Tablero.listaAgentes.get(i).getCapacidad() != 0 && !(Tablero.listaAgentes.get(i) instanceof AgenteEspecial)){
 				AgenteCargador cargador = (AgenteCargador)Tablero.listaAgentes.get(i);
 				if(cargador.getBuzonInformativo().indexOf(this.getMensajeInformativo()) == -1){
 					cargador.getBuzonInformativo().add(this.getMensajeInformativo());
@@ -164,6 +233,7 @@ public class AgenteExplorador extends Agente {
 				}
 			}
 		}
+		
 		this.setHaveToReSend(false);
 		return alreadyInMailbox;
 	}

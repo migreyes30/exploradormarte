@@ -26,6 +26,7 @@ public class Agente {
 	public static final int DIAG_INF_IZQ = 1;
 
 	public boolean dejarMoronas;
+	public boolean cargandoDejandoPiedras = false;
 
 	public Agente(String id, Posicion pos){
 		this.setId(id);
@@ -98,8 +99,37 @@ public class Agente {
 				i = 0;
 			switch (capas[i]) {
 			case 1:
-				if (this.resultado.getOcupacion().startsWith("O")
-						|| this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
+				if (this.resultado.getOcupacion().startsWith("O") || this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
+				
+					if (this.resultado.getOcupacion().startsWith("A") && this instanceof AgenteEspecial){ //El agente especial roba piedras
+						try {
+							Agente agenteObstaculizando = (Agente)Tablero.obtenerElementoConId(this.resultado.getOcupacion());
+							
+							if(agenteObstaculizando.getCargaActual() > 0 
+									&& !agenteObstaculizando.cargandoDejandoPiedras){
+								String msj = "------------------\n" +
+							     "MUAJAJA LE ROBE " + agenteObstaculizando.getCargaActual() + "\n" + 
+							     " PIEDRAS A " + agenteObstaculizando.getId() + "\n" +
+							     "------------------\n";
+
+								TableroGrafico.mensajes.append(msj);
+								
+								SwingUtilities.invokeLater(new Runnable() {
+								   public void run() {
+								         TableroGrafico.mensajes.setCaretPosition(
+								       		  	TableroGrafico.mensajes.getText().length());
+								   }
+								 });
+								
+								this.setCargaActual(this.getCargaActual() + agenteObstaculizando.getCargaActual());
+								agenteObstaculizando.setCargaActual(0);
+								
+							}
+						} catch (NoExisteElementoException e) { 
+
+						}
+					}
+					
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
 				}
@@ -637,6 +667,7 @@ public class Agente {
 			Tablero.borrarMensaje(monticulo.getPosicion());
 		}
 		while(cupo > 0 && monticulo.getPiedras() > 0){
+			this.cargandoDejandoPiedras = true;
 			this.setCargaActual(this.getCargaActual() + 1);
 			monticulo.setPiedras(monticulo.getPiedras() - 1);
 			TableroGrafico.replace(TableroGrafico.panelPiedras,
@@ -668,11 +699,14 @@ public class Agente {
 			}
 
 		}
+		this.cargandoDejandoPiedras = false;
 		return true;
 	}
 
 	public synchronized boolean dejarPiedras(){
 		while(this.getCargaActual() > 0){
+			this.cargandoDejandoPiedras = true;
+			
 			this.setCargaActual(this.getCargaActual() - 1);
 			Tablero.nave.setPiedras(Tablero.nave.getPiedras() + 1);
 			TableroGrafico.replace(TableroGrafico.panelPiedras,
@@ -695,6 +729,8 @@ public class Agente {
 
 		}
 		this.dejarMoronas = false;
+		this.cargandoDejandoPiedras = false;
+		
 		return true;
 	}
 

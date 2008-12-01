@@ -2,6 +2,10 @@ package mx.itesm.cem.explorador;
 
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
+import mx.itesm.cem.grafico.TableroGrafico;
+
 public class AgenteCargador extends Agente {
 	
 	private int salarioMinimo = 0;
@@ -176,7 +180,7 @@ public synchronized boolean leerSolicitudes(){
 			}
 			else{
 				this.mandarMensajeAceptacion(msjConPremioMayor.getSender(), true, 
-						"Puedo ir a monticulo en posicion " + 
+						"Puedo ir a monticulo en \n\tposicion " + 
 						msjConPremioMayor.getPosicionMonticulo().getI() + ", " +
 						msjConPremioMayor.getPosicionMonticulo().getJ());
 				
@@ -193,7 +197,7 @@ public synchronized boolean leerSolicitudes(){
 		else{
 			
 			this.mandarMensajeAceptacion(mensajeCercano.getSender(), true, 
-					"Puedo ir a monticulo en posicion " + 
+					"Puedo ir a monticulo en \n\tposicion " + 
 					mensajeCercano.getPosicionMonticulo().getI() + ", " +
 					mensajeCercano.getPosicionMonticulo().getJ());
 			
@@ -216,6 +220,23 @@ public synchronized boolean leerSolicitudes(){
 		MensajeAceptacion msj = new MensajeAceptacion(this.getId(), receiver, aceptacion, razon);
 		AgenteExplorador explorador = (AgenteExplorador) Tablero.obtenerElementoConId(receiver);
 		explorador.getBuzonAceptacion().add(msj);
+		if(aceptacion){
+			String msjito = "(Aceptar\n" +
+			 "\t:sender " + this.getId() + "\n" +
+			 "\t:language Español \n" +
+			 "\t:ontology Marte \n" +
+			 "\t:content " + msj.getRazon() +
+			 ")\n\n";
+	
+			TableroGrafico.mensajes.append(msjito);
+			
+			SwingUtilities.invokeLater(new Runnable() {
+			   public void run() {
+			         TableroGrafico.mensajes.setCaretPosition(
+			       		  	TableroGrafico.mensajes.getText().length());
+			   }
+			 });
+		}
 	}
 	
 	public boolean cumplirContrato(){

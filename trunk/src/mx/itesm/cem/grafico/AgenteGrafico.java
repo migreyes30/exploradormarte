@@ -13,10 +13,14 @@ public class AgenteGrafico extends ElementoGrafico {
 		this.id = id;
 		this.setPosicion(pos);
 		Agente a = (Agente)Tablero.obtenerElementoConId(id);
-		if(a.getCapacidad() == 0)
+		if(a.getCapacidad() == 0) {
 			this.imagen = new ImageIcon(getClass().getResource("explorador.png"));
-		else
+		} else if (a.getCapacidad() == 5000){
+			this.imagen = new ImageIcon(getClass().getResource("especial2.png"));
+		} else {
 			this.imagen = new ImageIcon(getClass().getResource("cargador.png"));
+		}
+			
 		
 		this.setIcon(imagen);		
 	}

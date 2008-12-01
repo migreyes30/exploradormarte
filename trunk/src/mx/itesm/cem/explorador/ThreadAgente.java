@@ -30,6 +30,10 @@ public class ThreadAgente implements Runnable{
 			try {
 				if(agente instanceof AgenteExplorador){
 					Thread.sleep(400);
+				} else if (agente instanceof AgenteCargador){
+					Thread.sleep(500);
+				} else if (agente instanceof AgenteEspecial) {
+					Thread.sleep(300);
 				} else {
 					Thread.sleep(500);
 				}
