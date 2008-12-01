@@ -29,7 +29,7 @@ public class PantallaEtapasAnteriores extends JFrame implements ActionListener{
 	private JComboBox ordenEvitarObstaculos, ordenLlevarPiedras, 
 					  ordenRecolectarMuestras,ordenMoronas,
 					  ordenKQML, ordenExplorar;
-	private JCheckBox usarMoronas, usarKQML;
+	private JCheckBox usarMoronas, usarKQML, usarAgenteEspecial;
 	private int tipoComunicacion;
 	
 	public PantallaEtapasAnteriores(){
@@ -142,13 +142,18 @@ public class PantallaEtapasAnteriores extends JFrame implements ActionListener{
 		
 		this.usarMoronas = new JCheckBox("Usar moronas");
 		this.usarKQML = new JCheckBox("Usar KQML");
+		this.usarAgenteEspecial = new JCheckBox("Usar Agente Especial");
 		
 		this.usarMoronas.addActionListener(this);
 		this.usarKQML.addActionListener(this);
+		this.usarAgenteEspecial.addActionListener(this);
+		
+		
 		
 		//Para que al hacer click no se dibuje un recuadro alrededor
 		usarMoronas.setFocusable(false);
 		usarKQML.setFocusable(false);
+		usarAgenteEspecial.setFocusable(false);
 		
 		
 		this.capasLeftBox.add(evitarObstaculosLbl);
@@ -181,6 +186,8 @@ public class PantallaEtapasAnteriores extends JFrame implements ActionListener{
 		this.capasRightBox.add(usarMoronas);
 		this.capasRightBox.add(Box.createVerticalStrut(40));
 		this.capasRightBox.add(usarKQML);
+		this.capasRightBox.add(Box.createVerticalStrut(40));
+		this.capasRightBox.add(usarAgenteEspecial);
 		
 		JPanel tituloPanel = new JPanel();
 		tituloPanel.add(tituloBox);
@@ -284,7 +291,7 @@ public class PantallaEtapasAnteriores extends JFrame implements ActionListener{
 					else{
 						this.setVisible(false);
 						
-						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes, 0, tipoComunicacion, false);
+						Tablero tb = new Tablero(numMonticulos, numObstaculos, numAgentes, 0, tipoComunicacion, false, usarAgenteEspecial.isSelected());
 						Tablero.capas = capasIntroducidas;
 						System.out.println(tb.toString());
 						

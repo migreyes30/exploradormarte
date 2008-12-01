@@ -17,7 +17,8 @@ public class PantallaContratantes extends JFrame implements ActionListener{
 	private static final int ANCHO_TEXTFIELD = 50;
 	private static final int ALTO_TEXTFIELD = 20;
 	private static final int NUM_CAPAS = 6;
-	private Box tituloBox, opcionesBox, entradasBox, capasLeftBox, capasCenterBox, botonesBox ;
+	private Box tituloBox, opcionesBox, entradasBox, capasLeftBox, capasCenterBox, capasRightBox, botonesBox ;
+	private JCheckBox usarAgenteEspecial;
 	public JPanel botonesPanel, parametrosPanel, capasPanel;
 	public JButton aceptarButton, borrarButton;
 	public JTextField monticulosTxt, obstaculosTxt, cargadoresTxt, exploradoresTxt;
@@ -43,6 +44,7 @@ public class PantallaContratantes extends JFrame implements ActionListener{
 		this.botonesBox = Box.createHorizontalBox();
 		this.capasLeftBox = Box.createVerticalBox();
 		this.capasCenterBox = Box.createVerticalBox();
+		this.capasRightBox = Box.createVerticalBox();
 		
 		
 		this.botonesPanel = new JPanel();
@@ -165,6 +167,15 @@ public class PantallaContratantes extends JFrame implements ActionListener{
 		this.capasCenterBox.add(Box.createVerticalStrut(35));
 		this.capasCenterBox.add(ordenExplorar);
 		
+		this.usarAgenteEspecial = new JCheckBox("Usar Agente Especial");
+		//Para que al hacer click no se dibuje un recuadro alrededor
+		this.usarAgenteEspecial.setFocusable(false);
+		this.usarAgenteEspecial.addActionListener(this);
+		
+		this.capasRightBox.add(Box.createVerticalStrut(51));
+		this.capasRightBox.add(usarAgenteEspecial);
+		
+		
 		JPanel tituloPanel = new JPanel();
 		tituloPanel.add(tituloBox);
 				
@@ -178,6 +189,7 @@ public class PantallaContratantes extends JFrame implements ActionListener{
 		capasPanel = new JPanel();
 		capasPanel.add(capasLeftBox, BorderLayout.WEST);
 		capasPanel.add(capasCenterBox, BorderLayout.CENTER);
+		capasPanel.add(capasRightBox, BorderLayout.EAST);
 				
 		parametrosPanel = new JPanel();
 		parametrosPanel.add(tituloPanel, BorderLayout.NORTH);
@@ -267,7 +279,7 @@ public class PantallaContratantes extends JFrame implements ActionListener{
 														"Error", JOptionPane.ERROR_MESSAGE);
 					else{
 						
-						PantallaExploradores configExploradores = new PantallaExploradores(capasIntroducidasCargador, numMonticulos, numObstaculos, numCargadores, numExploradores );
+						PantallaExploradores configExploradores = new PantallaExploradores(capasIntroducidasCargador, numMonticulos, numObstaculos, numCargadores, numExploradores, usarAgenteEspecial.isSelected());
 						configExploradores.setVisible(true);
 						this.setVisible(false);
 					}

@@ -39,26 +39,37 @@ public class Tablero {
 	public static int[] capas;
 	public static Map<Integer, String> nombresCapas;
 	public static ArrayList<MensajeInformativo> buzon;
-	public static boolean comunicacionMoronas;
-	public static boolean comunicacionKQML;
-	public static boolean redContratantes;
+	public static boolean comunicacionMoronas,comunicacionKQML, redContratantes, agenteEspecial;
 
 	public static int maxIdMorona = 0;
 
-	public Tablero(int numMonticulos, int numObstaculos, int numCargadores, int numExploradores, int comunicacion, boolean contratantes){
+	public Tablero(int numMonticulos, int numObstaculos, int numCargadores, int numExploradores, int comunicacion, boolean contratantes, boolean agenteEspecial){
 
 		Tablero.NUM_MONTICULOS = numMonticulos;
 		Tablero.NUM_OBSTACULOS = numObstaculos;
 		Tablero.NUM_CARGADORES = numCargadores;
 		Tablero.NUM_EXPLORADORES = numExploradores;
 		Tablero.redContratantes = contratantes;
+		Tablero.agenteEspecial = agenteEspecial;
 		
 		Tablero.nombresCapas = new HashMap<Integer, String>();
-		nombresCapas.put(new Integer(1), "Evitar Obstaculo");
-		nombresCapas.put(new Integer(2), "Regresar a Nave");
-		nombresCapas.put(new Integer(3), "Cargar piedras");
+		if (contratantes){
+			
+			nombresCapas.put(new Integer(1), "Evitar Obstaculo");
+			nombresCapas.put(new Integer(2), "Regresar a Nave");
+			nombresCapas.put(new Integer(3), "Cumplir contrato");
+			nombresCapas.put(new Integer(4), "Recolectar piedras");
+			nombresCapas.put(new Integer(5), "Leer solicitudes");
+			nombresCapas.put(new Integer(6), "Explorar");
+			
+		} else {
+			nombresCapas.put(new Integer(1), "Evitar Obstaculo");
+			nombresCapas.put(new Integer(2), "Regresar a Nave");
+			nombresCapas.put(new Integer(3), "Cargar piedras");
+			
+			nombresCapas.put(new Integer(5), "Explorar");
+		}
 		
-		nombresCapas.put(new Integer(5), "Explorar");
 
 		Tablero.listaAgentes = new ArrayList<Agente>();
 		Tablero.listaMonticulos = new ArrayList<Monticulo>();
@@ -148,6 +159,20 @@ public class Tablero {
 
 		}
 
+		/*Insertando agente especial*/
+		
+		if (Tablero.agenteEspecial){
+			iAzar = (int)(Math.random()* CASILLAS);
+			jAzar = (int)(Math.random()* CASILLAS);
+
+			if(mat[iAzar][jAzar] == "-"){
+				String id = "A" + (int)(Math.random()*35536);
+				mat[iAzar][jAzar] = id;
+				Tablero.listaAgentes.add(new AgenteEspecial(id,
+											new Posicion(iAzar,jAzar)));
+			}
+		}
+		
 		/*Insertando exploradores*/
 		while(cantExploradores > 0){
 			iAzar = (int)(Math.random()* CASILLAS);

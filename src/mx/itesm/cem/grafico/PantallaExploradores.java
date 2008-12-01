@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import mx.itesm.cem.explorador.AgenteCargador;
+import mx.itesm.cem.explorador.AgenteEspecial;
 import mx.itesm.cem.explorador.Tablero;
 import mx.itesm.cem.explorador.ThreadAgente;
 
@@ -27,11 +28,11 @@ public class PantallaExploradores extends JFrame implements ActionListener{
 	public JTextField monticulosTxt, obstaculosTxt, cargadoresTxt, exploradoresTxt;
 	public JLabel ordenaCapasLbl;
 	public int numPiedras, numMonticulos, numObstaculos, numCargadores, numExploradores;
-	public boolean datosValidos;
+	public boolean datosValidos, agenteEspecial;
 	private JComboBox ordenEvitarObstaculos, ordenContratar, ordenInformar, ordenExplorar;
 	private int[] capasIntroducidasCargador;
 	
-	public PantallaExploradores(int[] capasIntroducidasCargador, int numMonticulos, int numObstaculos, int numCargadores, int numExploradores){
+	public PantallaExploradores(int[] capasIntroducidasCargador, int numMonticulos, int numObstaculos, int numCargadores, int numExploradores, boolean agenteEspecial){
 					
 		this.setTitle("Bienvenido al explorador de marte");
 		this.setSize(ANCHO, ALTO);
@@ -182,6 +183,7 @@ public class PantallaExploradores extends JFrame implements ActionListener{
 		this.add(botonesPanel, BorderLayout.SOUTH);	
 		
 		this.capasIntroducidasCargador = capasIntroducidasCargador;
+		this.agenteEspecial = agenteEspecial;
 				
 	}
 
@@ -253,14 +255,14 @@ public class PantallaExploradores extends JFrame implements ActionListener{
 					else{
 						this.setVisible(false);
 						
-						Tablero tb = new Tablero(numMonticulos, numObstaculos, numCargadores, numExploradores, 0, true);
+						Tablero tb = new Tablero(numMonticulos, numObstaculos, numCargadores, numExploradores, 0, true, agenteEspecial);
 						//TODO: Solo se despliegan las capas del cargador
 						Tablero.capas = capasIntroducidasCargador;
 						System.out.println(tb.toString());
 						
 						TableroGrafico tg = new TableroGrafico();
 						for(int i=0; i < Tablero.listaAgentes.size(); i++){
-							if (Tablero.listaAgentes.get(i) instanceof AgenteCargador){
+							if (Tablero.listaAgentes.get(i) instanceof AgenteCargador || Tablero.listaAgentes.get(i) instanceof AgenteEspecial ){
 								new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidasCargador, tg);	
 							} else {
 								new ThreadAgente(Tablero.listaAgentes.get(i), capasIntroducidasExplorador, tg);
