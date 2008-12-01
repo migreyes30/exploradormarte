@@ -166,7 +166,7 @@ public class Agente {
 	public synchronized boolean explorar(){
 		this.caminar();
 
-		return this.resultado.isExito();
+		return this.getResultado().isExito();
 	}
 
 	/* Los movimientos correspoden a los siguientes numeros:
@@ -274,7 +274,7 @@ public class Agente {
 			}
 			this.setResultado(nuevaPosicion, false, casillaAEvaluar);
 		}
-		return this.resultado;
+		return this.getResultado();
 	}
 
 /**
