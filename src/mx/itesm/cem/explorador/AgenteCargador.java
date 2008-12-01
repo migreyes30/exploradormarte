@@ -5,14 +5,16 @@ import java.util.ArrayList;
 public class AgenteCargador extends Agente {
 	
 	private int salarioMinimo = 0;
+	private boolean cumpliendoContrato;
 	public ArrayList<MensajeInformativo> buzonInformativo;
 	public ArrayList<MensajeContratacion> buzonContratacion;
 	
 	public AgenteCargador(String id, Posicion pos) {
 		super(id, pos);
-		this.buzonInformativo = new ArrayList<MensajeInformativo>();
-		this.buzonContratacion = new ArrayList<MensajeContratacion>();
-		
+		this.setBuzonContratacion(new ArrayList<MensajeContratacion>());
+		this.setBuzonInformativo(new ArrayList<MensajeInformativo>());
+		this.setCumpliendoContrato(false);
+
 		while(this.getSalarioMinimo() < 10)
 			this.setSalarioMinimo((int)(Math.random()*26));
 	}
@@ -25,6 +27,31 @@ public class AgenteCargador extends Agente {
 		this.salarioMinimo = salarioMinimo;
 	}
 	
+	public boolean isCumpliendoContrato() {
+		return cumpliendoContrato;
+	}
+
+	public void setCumpliendoContrato(boolean cumpliendoContrato) {
+		this.cumpliendoContrato = cumpliendoContrato;
+	}
+
+	public ArrayList<MensajeInformativo> getBuzonInformativo() {
+		return buzonInformativo;
+	}
+
+	public void setBuzonInformativo(ArrayList<MensajeInformativo> buzonInformativo) {
+		this.buzonInformativo = buzonInformativo;
+	}
+
+	public ArrayList<MensajeContratacion> getBuzonContratacion() {
+		return buzonContratacion;
+	}
+
+	public void setBuzonContratacion(
+			ArrayList<MensajeContratacion> buzonContratacion) {
+		this.buzonContratacion = buzonContratacion;
+	}
+
 	public synchronized void actuar(int[] capas){
 		int i =0;
 		boolean exito = false;
@@ -33,40 +60,61 @@ public class AgenteCargador extends Agente {
 				i = 0;
 			switch (capas[i]) {
 			case 1:
-				if (this.resultado.getOcupacion().startsWith("O")
-						|| this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
+				if (this.getResultado().getOcupacion().startsWith("O")
+						|| this.getResultado().getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
 				}
 				break;
 			case 2:
-				if (this.cargaActual != 0) { //Si lleva piedras su prioridad es ir a la nave
+				if (this.getCargaActual() != 0) { //Si lleva piedras su prioridad es ir a la nave
 					System.out.println("Ejecutando Capa 2");
 					exito = this.regresarANave();
-					if(this.resultado.getOcupacion().startsWith("N")){
+					if(this.getResultado().getOcupacion().startsWith("N")){
 						//System.out.print(this.getId() + ": deje " + this.getCargaActual() + " piedras\n");
 						this.dejarPiedras();
+						this.setCumpliendoContrato(false);
 						exito = true;
 					}
 				}
 				break;
 				
 			case 3:
-				System.out.println("Ejecutando Capa 3: Cumplir Contrato");
-				exito = this.cumplirContrato();
+				if(this.getBuzonContratacion().size() != 0 && this.getCargaActual() == 0){
+					System.out.println("Ejecutando Capa 3: Cumplir Contrato");
+					exito = this.cumplirContrato();
+				}
 				break;
 				
 			case 4:
-				if (this.resultado.getOcupacion().startsWith("M")&& this.getCargaActual() == 0) { //Si intentaste moverte a una casilla que tiene un monticulo
-					System.out.println("Ejecutando Capa 4");
-					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
-					System.out.print(this.getId() + ": ");
-					exito = this.cargar(monticulo);
+				if (this.getResultado().getOcupacion().startsWith("M") && this.getCargaActual() == 0) {
+					Monticulo monticuloContrato = null;
+					if(this.getBuzonContratacion().size() != 0){
+						String idMontiContrato = Tablero.matriz[this.getBuzonContratacion().get(0).getPosicionMonticulo().getI()][this.getBuzonContratacion().get(0).getPosicionMonticulo().getJ()];
+						monticuloContrato = (Monticulo) (Tablero.obtenerElementoConId(idMontiContrato));
+					}
+					
+					if(!this.isCumpliendoContrato()){
+						//Si intentaste moverte a una casilla que tiene un monticulo
+						System.out.println("Ejecutando Capa 4");
+						Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.getResultado().getOcupacion()));
+						System.out.print(this.getId() + ": ");
+						exito = this.cargar(monticulo);
+					}else if(this.getBuzonContratacion().size() != 0 && monticuloContrato.getId() == this.getResultado().getOcupacion()){
+						System.out.println("Ejecutando Capa 4 (Contrato)");
+						Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.getResultado().getOcupacion()));
+						System.out.print(this.getId() + ": ");
+						monticulo.setEnContrato(false);
+						exito = this.cargar(monticulo);
+					}
+					
 				}
 				break;
 			case 5:
-				System.out.println("Ejecutando capa 5: Leer Solicitudes");
-				exito = this.leerSolicitudes();
+				if((!this.isCumpliendoContrato() || this.getCargaActual() == 0) && this.buzonContratacion.size() == 0){
+					System.out.println("Ejecutando capa 5: Leer Solicitudes");
+					exito = this.leerSolicitudes();
+				}
 				break;
 
 			case 6:
@@ -83,11 +131,12 @@ public class AgenteCargador extends Agente {
 		}
 	}
 	
-	public synchronized boolean leerSolicitudes(){
+public synchronized boolean leerSolicitudes(){
 		
-		if(this.buzonInformativo.size() == 0){
+		if(this.getBuzonInformativo().size() == 0){
 			return false;
 		}
+		
 		
 		int premioMayor = 0,
 			iMenor = 8,
@@ -96,74 +145,77 @@ public class AgenteCargador extends Agente {
 		MensajeInformativo msjConPremioMayor = null,
 						   mensajeCercano = null;
 		
-		for (MensajeInformativo mensajeIterado : this.buzonInformativo) {
-			int iRelativa = Math.abs(this.getPosicion().getI() - mensajeIterado.getPosicionMonticulo().getI());
-			int jRelativa = Math.abs(this.getPosicion().getJ() - mensajeIterado.getPosicionMonticulo().getJ());
-
-			if (iRelativa <= 7 && jRelativa <= 7){
-				if (iRelativa + jRelativa < iMenor + jMenor){
-					iMenor = iRelativa;
-					jMenor = jRelativa;
-					mensajeCercano = mensajeIterado;
+		for (MensajeInformativo mensajeIterado : this.getBuzonInformativo()) {
+			if(mensajeIterado.getPremio() >= this.getSalarioMinimo()){
+				
+				if((mensajeIterado.getPremio() > premioMayor)){
+					msjConPremioMayor = mensajeIterado;
+					premioMayor = msjConPremioMayor.getPremio();
+				}	
+				
+				int iRelativa = Math.abs(this.getPosicion().getI() - mensajeIterado.getPosicionMonticulo().getI());
+				int jRelativa = Math.abs(this.getPosicion().getJ() - mensajeIterado.getPosicionMonticulo().getJ());
+	
+				if (iRelativa <= 7 && jRelativa <= 7){
+					if ((iRelativa + jRelativa < iMenor + jMenor)){
+						iMenor = iRelativa;
+						jMenor = jRelativa;
+						mensajeCercano = mensajeIterado;
+					}
 				}
 			}
-			
-			if((mensajeIterado.getPremio() > premioMayor)
-					&& mensajeIterado.getPremio() >= this.getSalarioMinimo()){
-				msjConPremioMayor = mensajeIterado;
-				premioMayor = msjConPremioMayor.getPremio();
-			}	
 		}
 		
-		if(msjConPremioMayor == null){
-			if(mensajeCercano == null){
-				for(int i=0; i < this.buzonInformativo.size(); i++){
-					this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
+		if(mensajeCercano == null){
+			if(msjConPremioMayor == null){
+				for(int i=0; i < this.getBuzonInformativo().size(); i++){
+					this.mandarMensajeAceptacion(this.getBuzonInformativo().get(i).getSender(), false, 
 												"No cumple con salario minimo y esta fuera de rango");
-					this.buzonInformativo.clear();
 				}
+				this.getBuzonInformativo().clear();
 			}
 			else{
-				this.mandarMensajeAceptacion(mensajeCercano.getSender(), true, 
+				this.mandarMensajeAceptacion(msjConPremioMayor.getSender(), true, 
 						"Puedo ir a monticulo en posicion " + 
-						mensajeCercano.getPosicionMonticulo().getI() + ", " +
-						mensajeCercano.getPosicionMonticulo().getJ());
+						msjConPremioMayor.getPosicionMonticulo().getI() + ", " +
+						msjConPremioMayor.getPosicionMonticulo().getJ());
 				
-				this.buzonInformativo.remove(msjConPremioMayor);
+				this.getBuzonInformativo().remove(msjConPremioMayor);
 
 				for(int i=0; i < this.buzonInformativo.size(); i++){
 					this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
-							"No cumple con salario minimo y encontre un monticulo cercano");
-					this.buzonInformativo.clear();
+							"Encontre un monticulo con mas recompensa");
 				}
+				this.getBuzonInformativo().clear();
 			}
 			
 		}
 		else{
 			
-			this.mandarMensajeAceptacion(msjConPremioMayor.getSender(), true, 
+			this.mandarMensajeAceptacion(mensajeCercano.getSender(), true, 
 					"Puedo ir a monticulo en posicion " + 
 					mensajeCercano.getPosicionMonticulo().getI() + ", " +
 					mensajeCercano.getPosicionMonticulo().getJ());
 			
-			this.buzonInformativo.remove(msjConPremioMayor);
+			this.buzonInformativo.remove(mensajeCercano);
 
 			for(int i=0; i < this.buzonInformativo.size(); i++){
 				this.mandarMensajeAceptacion(this.buzonInformativo.get(i).getSender(), false, 
-						"Encontre un monticulo con mayor oferta");
-				this.buzonInformativo.clear();
+						"Encontre un monticulo mas cercano");
 			}
+			this.getBuzonInformativo().clear();
 		}
 		
 		return true;
 		
 	
 	}
+
 	public void mandarMensajeAceptacion(String receiver, boolean aceptacion, String razon){
 		
 		MensajeAceptacion msj = new MensajeAceptacion(this.getId(), receiver, aceptacion, razon);
 		AgenteExplorador explorador = (AgenteExplorador) Tablero.obtenerElementoConId(receiver);
-		explorador.buzonAceptacion.add(msj);
+		explorador.getBuzonAceptacion().add(msj);
 	}
 	
 	public boolean cumplirContrato(){
@@ -177,8 +229,10 @@ public class AgenteCargador extends Agente {
 			return false;
 		}
 		
-		else
+		else{
+			this.setCumpliendoContrato(true);
 			return this.irAMonitculo(contrato.getPosicionMonticulo());
+		}
 		
 	}
 

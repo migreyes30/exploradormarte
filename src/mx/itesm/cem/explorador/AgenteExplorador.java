@@ -7,11 +7,13 @@ public class AgenteExplorador extends Agente {
 
 	public ArrayList<MensajeAceptacion> buzonAceptacion;
 	MensajeInformativo mensajeInformativo;
+	private boolean haveToReSend;
 
 	public AgenteExplorador(String id, Posicion posicion) {
 		super(id, posicion);
 		super.setCapacidad(0);
-		buzonAceptacion = new ArrayList<MensajeAceptacion>();
+		this.setHaveToReSend(false);
+		this.setBuzonAceptacion(new ArrayList<MensajeAceptacion>());
 	}
 
 /**
@@ -31,15 +33,16 @@ public class AgenteExplorador extends Agente {
 			switch (capas[i]) {
 
 			case 1:
-				if (this.resultado.getOcupacion().startsWith("O")
-						|| this.resultado.getOcupacion().startsWith("A")) { //Si la casilla a la que quieres moverte esta ocupada
+				if (this.getResultado().getOcupacion().startsWith("O") || this.getResultado().getOcupacion().startsWith("A")) { 
+					//Si la casilla a la que quieres moverte esta ocupada
 					System.out.println("Ejecutando Capa 1");
 					exito = this.evitarObstaculo();
 				}
 				break;
 
 			case 2:
-				if (this.buzonAceptacion.size() != 0 && this.mensajeInformativo != null) { //Si intentaste moverte a una casilla que tiene un monticulo
+				if (this.getBuzonAceptacion().size() != 0 && this.getMensajeInformativo() != null) {  
+					//Si intentaste moverte a una casilla que tiene un monticulo
 					System.out.println("Ejecutando Capa 2");
 					System.out.print(this.getId() + ": ");
 					exito = this.contratar();
@@ -47,14 +50,15 @@ public class AgenteExplorador extends Agente {
 				break;
 
 			case 3:
-				if(this.mensajeInformativo != null){
+				if(this.ishaveToReSend()){
 					System.out.println("Ejecutando Capa 3");
 					System.out.print(this.getId() + ": ");
 					exito = this.informar(this.mensajeInformativo);
-				}else if (this.resultado.getOcupacion().startsWith("M")) {
+				
+				}else if (this.getResultado().getOcupacion().startsWith("M") && this.getMensajeInformativo() == null) {
 					//Si intentaste moverte a una casilla que tiene un monticulo
 					System.out.println("Ejecutando Capa 3");
-					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.resultado.getOcupacion()));
+					Monticulo monticulo = (Monticulo)(Tablero.obtenerElementoConId(this.getResultado().getOcupacion()));
 					System.out.print(this.getId() + ": ");
 					exito = this.informar(monticulo);
 				}
@@ -78,7 +82,7 @@ public class AgenteExplorador extends Agente {
 	public synchronized boolean contratar(){
 
 		ArrayList<MensajeAceptacion> mensajesPositivos = new ArrayList<MensajeAceptacion>();
-		for (MensajeAceptacion mensajeIterado : buzonAceptacion) {
+		for (MensajeAceptacion mensajeIterado : this.getBuzonAceptacion()) {
 			if (mensajeIterado.isAceptarContrato()){
 				mensajesPositivos.add(mensajeIterado);
 			}
@@ -86,24 +90,27 @@ public class AgenteExplorador extends Agente {
 
 		if(mensajesPositivos.size() == 1){
 			// winner
-			String idMonticulo = Tablero.matriz[this.mensajeInformativo.getPosicionMonticulo().getI()][this.mensajeInformativo.getPosicionMonticulo().getJ()];
+			String idMonticulo = Tablero.matriz[this.getMensajeInformativo().getPosicionMonticulo().getI()][this.getMensajeInformativo().getPosicionMonticulo().getJ()];
 			Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
 			monticulo.setContratoAbierto(false);
-			MensajeContratacion mensajeContratacion = new MensajeContratacion(this.id, mensajesPositivos.get(0).getSender(),
-														this.mensajeInformativo.getPremio(), this.mensajeInformativo.getNumPiedras(),
-														this.mensajeInformativo.getPosicionMonticulo());
+			MensajeContratacion mensajeContratacion = new MensajeContratacion(
+														this.getId(), mensajesPositivos.get(0).getSender(),
+														this.getMensajeInformativo().getPremio(), 
+														this.getMensajeInformativo().getNumPiedras(),
+														this.getMensajeInformativo().getPosicionMonticulo());
 			AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
-			cargador.buzonContratacion.add(mensajeContratacion);
-			this.mensajeInformativo = null;
-			this.buzonAceptacion.removeAll(buzonAceptacion);
+			cargador.getBuzonContratacion().add(mensajeContratacion);
+			this.setMensajeInformativo(null);
+			this.getBuzonAceptacion().clear();
 			return true;
 		}else if(mensajesPositivos.size() == 0) {
 			//more reward
-			this.mensajeInformativo.setPremio(this.mensajeInformativo.getPremio() + 2);
+			this.getMensajeInformativo().setPremio(this.getMensajeInformativo().getPremio() + 2);
+			this.setHaveToReSend(true);
 			return false;
 		}else {
 			// if(mensajesPositivos.size() > 1 )
-			String idMonticulo = Tablero.matriz[this.mensajeInformativo.getPosicionMonticulo().getI()][this.mensajeInformativo.getPosicionMonticulo().getJ()];
+			String idMonticulo = Tablero.matriz[this.getMensajeInformativo().getPosicionMonticulo().getI()][this.getMensajeInformativo().getPosicionMonticulo().getJ()];
 			Monticulo monticulo = (Monticulo)Tablero.obtenerElementoConId(idMonticulo);
 			monticulo.setContratoAbierto(false);
 			AgenteCargador cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(0).getSender());
@@ -117,43 +124,72 @@ public class AgenteExplorador extends Agente {
 				}
 			}
 
-			MensajeContratacion mensajeContratacion = new MensajeContratacion(this.id, mensajesPositivos.get(indexMensaje).getSender(),
-					this.mensajeInformativo.getPremio(), this.mensajeInformativo.getNumPiedras(),
-					this.mensajeInformativo.getPosicionMonticulo());
+			MensajeContratacion mensajeContratacion = new MensajeContratacion(this.getId(), mensajesPositivos.get(indexMensaje).getSender(),
+					this.getMensajeInformativo().getPremio(), this.getMensajeInformativo().getNumPiedras(),
+					this.getMensajeInformativo().getPosicionMonticulo());
 			cargador = (AgenteCargador)Tablero.obtenerElementoConId(mensajesPositivos.get(indexMensaje).getSender());
 			cargador.buzonContratacion.add(mensajeContratacion);
-			this.mensajeInformativo = null;
-			this.buzonAceptacion.removeAll(buzonAceptacion);
+			
+			this.setMensajeInformativo(null);
+			this.getBuzonAceptacion().clear();
 			return true;
-
 		}
-
-
 	}
 
-
 	public synchronized boolean informar(Monticulo monticulo){
-
-		MensajeInformativo mensajeInformativo = new MensajeInformativo(monticulo.getPosicion(), this.id, monticulo.piedras);
-		this.mensajeInformativo = mensajeInformativo;
-		monticulo.setContratoAbierto(true);
+		if(monticulo.isEnContrato()){
+			return false;
+		}
+		MensajeInformativo mensajeInformativo = new MensajeInformativo(monticulo.getPosicion(), this.getId(), monticulo.getPiedras());
+		this.setMensajeInformativo(mensajeInformativo);
 		for (int i = 0; i < Tablero.listaAgentes.size(); i++) {
 			if (Tablero.listaAgentes.get(i).capacidad != 0){
 				AgenteCargador cargador =(AgenteCargador)Tablero.listaAgentes.get(i);
-				cargador.buzonInformativo.add(mensajeInformativo);
+				cargador.getBuzonInformativo().add(mensajeInformativo);
 			}
 		}
+		monticulo.setContratoAbierto(true);
+		monticulo.setEnContrato(true);
 		return true;
 	}
 
 	public synchronized  boolean informar(MensajeInformativo mensajeInformativo){
+		boolean alreadyInMailbox = false;
 		for (int i = 0; i < Tablero.listaAgentes.size(); i++) {
-			if (Tablero.listaAgentes.get(i).capacidad != 0){
-				AgenteCargador cargador =(AgenteCargador)Tablero.listaAgentes.get(i);
-				cargador.buzonInformativo.add(this.mensajeInformativo);
+			if (Tablero.listaAgentes.get(i).getCapacidad() != 0){
+				AgenteCargador cargador = (AgenteCargador)Tablero.listaAgentes.get(i);
+				if(cargador.getBuzonInformativo().indexOf(this.getMensajeInformativo()) == -1){
+					cargador.getBuzonInformativo().add(this.getMensajeInformativo());
+					alreadyInMailbox = true;
+				}
 			}
 		}
-		return true;
+		this.setHaveToReSend(false);
+		return alreadyInMailbox;
+	}
+
+	public ArrayList<MensajeAceptacion> getBuzonAceptacion() {
+		return buzonAceptacion;
+	}
+
+	public void setBuzonAceptacion(ArrayList<MensajeAceptacion> buzonAceptacion) {
+		this.buzonAceptacion = buzonAceptacion;
+	}
+
+	public MensajeInformativo getMensajeInformativo() {
+		return mensajeInformativo;
+	}
+
+	public void setMensajeInformativo(MensajeInformativo mensajeInformativo) {
+		this.mensajeInformativo = mensajeInformativo;
+	}
+
+	public boolean ishaveToReSend() {
+		return haveToReSend;
+	}
+
+	public void setHaveToReSend(boolean haveToReSend) {
+		this.haveToReSend = haveToReSend;
 	}
 
 }

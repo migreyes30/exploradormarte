@@ -7,6 +7,7 @@ public class Monticulo {
 	private String id;
 	int piedras = 0;
 	private boolean contratoAbierto = false;
+	private boolean enContrato = false;
 
 	public Monticulo(String id, Posicion pos){
 		this.setId(id);
@@ -42,6 +43,14 @@ public class Monticulo {
 
 	public void setContratoAbierto(boolean contratoAbierto) {
 		this.contratoAbierto = contratoAbierto;
+	}
+
+	public boolean isEnContrato() {
+		return enContrato;
+	}
+
+	public void setEnContrato(boolean enContrato) {
+		this.enContrato = enContrato;
 	}
 
 }

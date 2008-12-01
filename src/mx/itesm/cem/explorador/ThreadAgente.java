@@ -29,9 +29,9 @@ public class ThreadAgente implements Runnable{
 			agente.actuar(capas);
 			try {
 				if(agente instanceof AgenteExplorador){
-					Thread.sleep(500);
-				} else {
 					Thread.sleep(400);
+				} else {
+					Thread.sleep(500);
 				}
 				
 			} catch (InterruptedException e) {

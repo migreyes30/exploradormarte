@@ -9,6 +9,8 @@ public class MensajeInformativo extends Mensaje{
 	public MensajeInformativo(Posicion posicionMonticulo, String sender, int premio){
 		super(sender, "broadcast");
 		this.setPosicionMonticulo(posicionMonticulo);
+		this.setNumPiedras(premio);
+		this.setPremio(premio);
 	}
 
 	public Posicion getPosicionMonticulo() {
