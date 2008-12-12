@@ -618,7 +618,7 @@ public class Agente {
 		if(iRelativa < 0){
 			if(jRelativa<0){
 				//1,2,4
-				if(this.caminar(DIAG_INF_DER).isExito()){
+				if(this.caminar(DIAG_INF_DER).isExito() || this.getResultado().getOcupacion().startsWith("N")){
 					return true;
 				}else if (this.caminar(DERECHA).isExito()) {
 					return true;
@@ -628,7 +628,7 @@ public class Agente {
 
 			}else{
 				//2,3,5
-				if(this.caminar(DIAG_INF_IZQ).isExito()){
+				if(this.caminar(DIAG_INF_IZQ).isExito() || this.getResultado().getOcupacion().startsWith("N")){
 					return true;
 				}else if (this.caminar(IZQUIERDA).isExito()){
 					return true;
@@ -638,7 +638,7 @@ public class Agente {
 			}
 		}else {
 			if(jRelativa<0){
-				if(this.caminar(DIAG_SUP_DER).isExito()){
+				if(this.caminar(DIAG_SUP_DER).isExito() || this.getResultado().getOcupacion().startsWith("N")){
 					return true;
 				}else if(this.caminar(DERECHA).isExito()){
 					return true;
@@ -646,7 +646,7 @@ public class Agente {
 					return this.caminar(ARRIBA).isExito();
 				}
 			}else{
-				if(this.caminar(DIAG_SUP_IZQ).isExito()){
+				if(this.caminar(DIAG_SUP_IZQ).isExito() || this.getResultado().getOcupacion().startsWith("N")){
 					return true;
 				}else if(this.caminar(IZQUIERDA).isExito()){
 					return true;
